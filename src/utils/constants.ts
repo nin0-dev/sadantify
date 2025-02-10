@@ -1,0 +1,12 @@
+import { PluginAuthor } from "./types";
+
+export const WEBPACK_CHUNK = "webpackChunkclient_web";
+export const LOGGER_NAME = "Extendify";
+export const CONFIG_KEY = "extendify-opts";
+
+export const Devs = /* #__PURE__*/ Object.freeze({
+    elia: {
+        name: "Elia",
+        github: "7elia"
+    }
+}) as Record<string, PluginAuthor>;

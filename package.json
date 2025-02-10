@@ -1,0 +1,35 @@
+{
+  "name": "extendify",
+  "version": "0.1.0",
+  "description": "Add extensions to your Spotify app",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node scripts/build/build.mjs",
+    "dev": "node scripts/build/build.mjs --dev && npm run devtools && node scripts/patch/applyPatch.mjs",
+    "report": "node scripts/build/build.mjs --reporter && npm run devtools && node scripts/patch/applyPatch.mjs",
+    "devtools": "node scripts/setDevtools.mjs",
+    "patch": "node scripts/patch/applyPatch.mjs",
+    "unpatch": "node scripts/patch/undoPatch.mjs"
+  },
+  "author": "7elia",
+  "license": "MIT",
+  "dependencies": {
+    "@intrnl/xxhash64": "^0.1.2",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/diff": "^7.0.0",
+    "@types/history": "^4.7.11",
+    "@types/html-minifier-terser": "^7.0.2",
+    "@types/jszip": "^3.4.0",
+    "@types/node": "^22.12.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "diff": "^7.0.0",
+    "esbuild": "^0.15.18",
+    "html-minifier-terser": "^7.2.0",
+    "tsx": "^4.19.2",
+    "type-fest": "^4.33.0",
+    "typescript": "^5.7.3"
+  }
+}

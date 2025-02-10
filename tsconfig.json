@@ -1,0 +1,39 @@
+{
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "esnext",
+            "esnext.array",
+            "esnext.asynciterable",
+            "esnext.symbol"
+        ],
+        "module": "esnext",
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": false,
+        "target": "ESNEXT",
+        "jsx": "preserve",
+        "baseUrl": "./src/",
+        "paths": {
+            "@api/*": ["./api/*"],
+            "@utils/*": ["./utils/*"],
+            "@webpack": ["./webpack/webpack"],
+            "@webpack/common": ["./webpack/common"],
+            "@webpack/types": ["./webpack/types"]
+        },
+        "plugins": [
+            {
+                "transform": "typescript-transform-paths",
+                "afterDeclarations": true
+            }
+        ],
+        "outDir": "dist"
+    },
+    "include": ["src/**/*", "scripts/**/*"]
+}

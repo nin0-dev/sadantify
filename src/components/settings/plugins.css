@@ -1,0 +1,102 @@
+.ext-plugins-page-layout {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 32px 16px;
+    gap: 16px;
+}
+
+.ext-warning-container {
+    display: flex;
+    flex-direction: column;
+    max-width: calc(900px - 32px * 2);
+    border: 3px solid var(--text-warning);
+    border-radius: 4px;
+    padding: 8px 16px;
+    gap: 16px;
+}
+
+.ext-warning-content {
+    margin-bottom: 4px;
+}
+
+.ext-warning-restart {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.ext-plugins-page-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.ext-plugins-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.ext-plugin {
+    background-color: var(--background-tinted-base);
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    display: block;
+    box-sizing: border-box;
+    transition: background-color .3s ease;
+    padding: 12px;
+}
+
+.ext-plugin:hover {
+    background-color: hsla(0, 0%, 100%, .2);
+}
+
+.ext-plugin-header {
+    display: flex;
+    width: 100%;
+    height: 2rem;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: .5em;
+}
+
+.ext-plugin-header-name {
+    width: 100%;
+}
+
+.ext-plugin-header-icon {
+    font-size: 10rem;
+}
+
+.ext-plugin-description {
+    height: 46px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.ext-plugin-authors {
+    display: flex;
+}
+
+.ext-plugin-author-pfp {
+    border-radius: 100%;
+    width: 48px;
+    height: 48px;
+}
+
+.ext-plugin-modal-description {
+    border-top: 2px solid var(--text-base);
+    padding-top: 10px;
+    margin-bottom: 10px;
+}
+
+.ext-plugin-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
