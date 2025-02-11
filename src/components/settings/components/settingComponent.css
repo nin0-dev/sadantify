@@ -8,4 +8,5 @@
 .ext-plugin-setting-metadata {
     display: flex;
     flex-direction: column;
+    width: 50%;
 }
