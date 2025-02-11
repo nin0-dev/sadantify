@@ -5,10 +5,6 @@ import { definePluginSettings } from "@api/settings";
 
 const ws = new ReconnectableWebSocket();
 
-import("@api/settings").then((module) => {
-    console.log(Object.keys(module).includes("definePluginSettings"), module.definePluginSettings);
-});
-
 const settings = definePluginSettings({
     stringTest: {
         type: OptionType.STRING,

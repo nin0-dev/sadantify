@@ -73,7 +73,7 @@ export const SettingsStore = new SettingsStoreClass(settings, {
 
 if (!IS_REPORTER) {
     SettingsStore.addGlobalChangeListener((_, path) => {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(SettingsStore.plain));
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(SettingsStore.plain, (_, value) => typeof value === "bigint" ? value.toString() : value));
     });
 }
 

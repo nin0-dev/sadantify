@@ -1,7 +1,7 @@
 import { PluginOptionSelect } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
 import { React, Text } from "@webpack/common";
-import SelectComponent from "components/SelectComponent";
+import SelectComponent, { Option } from "components/SelectComponent";
 
 export default (props: ISettingElementProps<PluginOptionSelect>) => {
     const [state, setState] = React.useState(props.pluginSettings[props.id] ?? props.setting.options?.find(o => o.default)?.value ?? null);
@@ -29,10 +29,12 @@ export default (props: ISettingElementProps<PluginOptionSelect>) => {
                 <Text as="span" semanticColor="textBase" variant="bodyMediumBold">{textToTitle(props.id)}</Text>
                 <Text as="span" semanticColor="textSubdued" variant="bodyMedium">{props.setting.description}</Text>
             </div>
-            <SelectComponent id={props.id} options={props.setting.options.map(v => ({
-                value: v.value,
-                label: v.label
-            }))} />
+            <SelectComponent
+                value={props.setting.options?.find(v => v.value === state)}
+                id={props.id}
+                options={props.setting.options as Option[]}
+                onSelect={v => onChange(v.value)}
+            />
             {error && <Text as="span" semanticColor="textNegative">{error}</Text>}
         </div>
     );

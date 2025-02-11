@@ -159,12 +159,12 @@ export class SettingsStore<T extends object> {
             const settingValue = settingPath.reduce((acc, curr) => acc[curr], root);
 
             this.globalListeners.forEach(cb => cb(root, settingPathStr));
-            this.pathListeners.get(settingPathStr)?.forEach(cb => cb(settingValue));
+            this.pathListeners.get(settingPathStr)?.forEach(cb => cb && cb(settingValue));
         } else {
             this.globalListeners.forEach(cb => cb(root, pathStr));
         }
 
-        this.pathListeners.get(pathStr)?.forEach(cb => cb(value));
+        this.pathListeners.get(pathStr)?.forEach(cb => cb && cb(value));
     }
 
     /**

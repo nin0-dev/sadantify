@@ -2,7 +2,7 @@ import { useSettings } from "@api/settings";
 import "./plugins.css";
 
 import { OptionType, Plugin } from "@utils/types";
-import { Link, React, Text, TooltipWrapper } from "@webpack/common";
+import { ButtonPrimary, ButtonSecondary, Link, React, Text, TooltipWrapper } from "@webpack/common";
 import { ModalComponent } from "components/ModalComponent";
 import { ComponentType } from "react";
 import { ISettingCustomElementProps, ISettingElementProps, SettingBooleanComponent, SettingCustomComponent, SettingNumericComponent, SettingSelectComponent, SettingSliderComponent, SettingTextComponent } from "./components";
@@ -11,6 +11,7 @@ type Props = {
     isOpen?: boolean;
     plugin: Plugin;
     onClose: () => void;
+    onRestartNeeded: () => void;
 }
 
 const isObjectEmpty = (obj: object): boolean => {
@@ -39,6 +40,36 @@ export default (props: Props) => {
     const [errors, setErrors] = React.useState<Record<string, boolean>>({});
     const [saveError, setSaveError] = React.useState<string | null>(null);
     const hasSettings = pluginSettings && props.plugin.options && !isObjectEmpty(props.plugin.options);
+
+    const saveAndClose = async () => {
+        if (!props.plugin.options) {
+            props.onClose();
+            return;
+        }
+
+        if (props.plugin.beforeSave) {
+            const result = await Promise.resolve(props.plugin.beforeSave(tempSettings));
+            if (result !== true) {
+                setSaveError(result);
+                return;
+            }
+        }
+
+        let restartNeeded = false;
+        for (const [key, value] of Object.entries(tempSettings)) {
+            const option = props.plugin.options[key];
+            pluginSettings[key] = value;
+
+            if (option.type === OptionType.CUSTOM) {
+                continue;
+            } else if (option?.restartNeeded) {
+                restartNeeded = true;
+            }
+        }
+        restartNeeded && props.onRestartNeeded();
+        
+        props.onClose();
+    };
 
     return (
         <ModalComponent
@@ -77,6 +108,10 @@ export default (props: Props) => {
                         definedSettings={props.plugin.settings}
                     />
                 }) : <Text as="span" variant="bodyMedium" semanticColor="textSubdued">This plugin has no settings.</Text>}
+            </div>
+            <div className="ext-plugin-modal-footer">
+                <ButtonPrimary onClick={() => saveAndClose()}>Save & Close</ButtonPrimary>
+                <ButtonSecondary onClick={() => props.onClose()}>Cancel</ButtonSecondary>
             </div>
         </ModalComponent>
     )

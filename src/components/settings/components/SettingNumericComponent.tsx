@@ -11,7 +11,7 @@ export default (props: ISettingElementProps<PluginOptionNumber>) => {
     
     React.useEffect(() => props.onError(error !== null), [error]);
 
-    const serialize = (v: any) => props.setting.type === OptionType.BIGINT ? BigInt(v) : v;
+    const serialize = (v: any) => props.setting.type === OptionType.BIGINT ? BigInt(v) : Number(v);
 
     const onChange = (v: any) => {
         const isValid = props.setting.isValid?.call(props.definedSettings, v) ?? true;
@@ -45,6 +45,7 @@ export default (props: ISettingElementProps<PluginOptionNumber>) => {
                 disabled={props.setting.disabled?.call(props.definedSettings) ?? false}
                 value={state}
                 type="number"
+                placeholder="Enter a number"
             />
             {error && <Text as="span" semanticColor="textNegative">{error}</Text>}
         </div>

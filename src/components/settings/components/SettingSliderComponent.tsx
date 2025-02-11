@@ -27,7 +27,6 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
 
     const onChange = (v: number) => {
         const realValue = getRealValue(v);
-        console.log(v, realValue);
 
         const isValid = props.setting.isValid?.call(props.definedSettings, realValue) ?? true;
         if (typeof isValid === "string") {

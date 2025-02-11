@@ -20,7 +20,7 @@ export default (props: Props) => {
 
     return (
         <div className="ext-plugin">
-            <PluginModalComponent isOpen={modalOpened} onClose={() => setModalOpened(false)} plugin={props.plugin} />
+            <PluginModalComponent onRestartNeeded={() => props.onRestartNeeded(props.plugin.name)} isOpen={modalOpened} onClose={() => setModalOpened(false)} plugin={props.plugin} />
             <div className="ext-plugin-header">
                 <Text
                     semanticColor="textBase"
