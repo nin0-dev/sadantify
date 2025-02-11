@@ -55,7 +55,30 @@ export const Text = waitForComponent<ComponentType<PropsWithChildren<{
     as?: ElementType;
     style?: string;
 }>>>("Text", filters.componentByCode("bodyMedium", /"data-encore-id":.\..\.Text/));
-export const Slider = waitForComponent("Slider", filters.componentByCode("progressBarRef"));
+export const Slider = waitForComponent<ComponentType<{
+    value?: number;
+    max?: number;
+    step?: number;
+    labelText?: string;
+    /** @default true */
+    isInteractive?: boolean;
+    /** @default false */
+    forceActiveStyles?: boolean;
+    saberConfig?: any;
+    /** @default false */
+    isPlayingStrangerThings?: boolean;
+    isAttackOnTitanEasterEggActive?: boolean;
+    direction?: "horizontal";
+    enableAnimation?: boolean;
+    updateFrequency?: number;
+    offFrequencyUpdate?: unknown;
+    className?: string;
+    /** @default false */
+    showValueAsTimeOverHandle?: boolean;
+    onDragStart?: (v: number) => void;
+    onDragMove?: (v: number) => void;
+    onDragEnd?: (v: number) => void;
+}>>("Slider", filters.componentByCode("progressBarRef"));
 export const Chip = waitForComponent("Chip", filters.componentByName("Chip"));
 
 export const Card = waitForComponent("Card", filters.componentByName("Card"));
