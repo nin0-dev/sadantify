@@ -169,7 +169,6 @@ export const createEventListeners = () => {
         }
 
         if (previousPlayerState.item && e.data.item?.uri !== previousPlayerState.item.uri) {
-            console.debug(getProgress());
             getPluginsForEvent("onSongChange").forEach(p => p.events?.onSongChange!(e.data.item!, e.data));
         }
         
