@@ -43,7 +43,8 @@ const settings = definePluginSettings({
     sliderTest: {
         type: OptionType.SLIDER,
         description: "A test for the 'slider' option type.",
-        markers: [ 0, 100 ],
+        minValue: 50,
+        maxValue: 250,
         default: 50
     }
 });

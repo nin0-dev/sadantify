@@ -225,18 +225,12 @@ export interface PluginSettingCustomDef {
 
 export interface PluginSettingSliderDef {
     type: OptionType.SLIDER;
-    /**
-     * All the possible values in the slider. Needs at least two values.
-     */
-    markers: number[];
+    minValue: number;
+    maxValue: number;
     /**
      * Default value to use
      */
-    default: number;
-    /**
-     * If false, allow users to select values in-between your markers.
-     */
-    stickToMarkers?: boolean;
+    default?: number;
 }
 
 export interface IPluginOptionComponentProps {
