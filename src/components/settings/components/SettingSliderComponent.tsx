@@ -1,6 +1,6 @@
 import { PluginOptionSlider } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
-import { React, Slider, Text, TooltipWrapper } from "@webpack/common";
+import { React, Slider, Text } from "@webpack/common";
 
 export default (props: ISettingElementProps<PluginOptionSlider>) => {
     const getDefaultValue = (): number => {
@@ -22,7 +22,7 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
     React.useEffect(() => props.onError(error !== null), [error]);
 
     const getRealValue = (v: number) => {
-        return v * (props.setting.maxValue - props.setting.minValue) + props.setting.minValue;
+        return v * props.setting.maxValue + props.setting.minValue;
     }
 
     const onChange = (v: number) => {
