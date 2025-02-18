@@ -8,7 +8,7 @@ export default definePlugin({
     required: true,
     patches: [
         {
-            find: "\"data-testid\":\"top-bar-back-button\"",
+            find: '"data-testid":"top-bar-back-button"',
             replacement: [
                 {
                     match: /(type:"locale",uri:"home"}\);return)(\[\(0,.*?\])(}\)\({isDesktop:)/,
@@ -22,7 +22,7 @@ export default definePlugin({
                     // Hopefully this is temporary.
                     match: /({value:"top-bar",children:)(.*?}\))(}\),\(0,)/,
                     replace: (_, prefix, children, suffix) => {
-                        return `${prefix}[!Extendify.Api.Page.isCustomPage() ? ${children} : null]${suffix}`
+                        return `${prefix}[!Extendify.Api.Page.isCustomPage() ? ${children} : null]${suffix}`;
                     }
                 }
             ]

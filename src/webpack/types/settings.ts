@@ -48,7 +48,7 @@ export interface SettingsAPI {
      * This setting isn't serializable, meaning it can't be written to.
      */
     viewportZoom: Setting<number>;
-};
+}
 
 export interface Setting<T> {
     getValue(): Promise<T>;
@@ -56,7 +56,7 @@ export interface Setting<T> {
     subValue(callback: (e) => void): void;
     identifier: string;
     key: string;
-};
+}
 
 /**
  * TODO
@@ -68,10 +68,13 @@ export interface PlaybackService {
     getFormats(e, t);
     getPlaybackInfo(e, t);
     getRawVolume(e, t);
-    getVolume(e: {
-        source: number;
-        volume: number;
-    }, t);
+    getVolume(
+        e: {
+            source: number;
+            volume: number;
+        },
+        t
+    );
     lowerVolume(e, t);
     raiseVolume(e, t);
     setRawVolume(e, t);
@@ -81,4 +84,4 @@ export interface PlaybackService {
     subPosition(e, t);
     subRawVolume(e, t);
     subVolume(e, t);
-};
+}

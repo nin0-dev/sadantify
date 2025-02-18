@@ -6,7 +6,12 @@
  */
 
 import { Logger } from "@utils/logger";
-import { DefinedSettings, OptionType, SettingsChecks, SettingsDefinition } from "@utils/types";
+import {
+    DefinedSettings,
+    OptionType,
+    SettingsChecks,
+    SettingsDefinition
+} from "@utils/types";
 import { SettingsStore as SettingsStoreClass } from "./settingsStore";
 import { CONFIG_KEY } from "@utils/constants";
 import { React, useEffect } from "@webpack/common";
@@ -19,15 +24,17 @@ export interface Settings {
         [plugin: string]: {
             enabled: boolean;
             [setting: string]: any;
-        }
-    }
-};
+        };
+    };
+}
 
 const DefaultSettings: Settings = {
     plugins: {}
 };
 
-const settings: Settings = !IS_REPORTER ? JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}") : {};
+const settings: Settings = !IS_REPORTER
+    ? JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}")
+    : {};
 mergeDefaults(settings, DefaultSettings);
 
 export const SettingsStore = new SettingsStoreClass(settings, {
@@ -39,9 +46,13 @@ export const SettingsStore = new SettingsStoreClass(settings, {
         }
 
         if (path === "plugins" && key in plugins) {
-            return target[key] = {
-                enabled: IS_REPORTER || plugins[key].required || plugins[key].enabledByDefault || false
-            };
+            return (target[key] = {
+                enabled:
+                    IS_REPORTER ||
+                    plugins[key].required ||
+                    plugins[key].enabledByDefault ||
+                    false
+            });
         }
 
         if (path.startsWith("plugins.")) {
@@ -58,7 +69,7 @@ export const SettingsStore = new SettingsStoreClass(settings, {
                 }
 
                 if (setting.type === OptionType.SELECT) {
-                    const def = setting.options.find(o => o.default);
+                    const def = setting.options.find((o) => o.default);
                     if (def) {
                         target[key] = def.value;
                     }
@@ -73,7 +84,12 @@ export const SettingsStore = new SettingsStoreClass(settings, {
 
 if (!IS_REPORTER) {
     SettingsStore.addGlobalChangeListener((_, path) => {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(SettingsStore.plain, (_, value) => typeof value === "bigint" ? value.toString() : value));
+        localStorage.setItem(
+            CONFIG_KEY,
+            JSON.stringify(SettingsStore.plain, (_, value) =>
+                typeof value === "bigint" ? value.toString() : value
+            )
+        );
     });
 }
 
@@ -106,8 +122,13 @@ export const useSettings = (paths?: UseSettings<Settings>[]) => {
 
     useEffect(() => {
         if (paths) {
-            paths.forEach(p => SettingsStore.addChangeListener(p, forceUpdate));
-            return () => paths.forEach(p => SettingsStore.removeChangeListener(p, forceUpdate));
+            paths.forEach((p) =>
+                SettingsStore.addChangeListener(p, forceUpdate)
+            );
+            return () =>
+                paths.forEach((p) =>
+                    SettingsStore.removeChangeListener(p, forceUpdate)
+                );
         } else {
             SettingsStore.addGlobalChangeListener(forceUpdate);
             return () => SettingsStore.removeGlobalChangeListener(forceUpdate);
@@ -115,7 +136,7 @@ export const useSettings = (paths?: UseSettings<Settings>[]) => {
     }, [paths]);
 
     return SettingsStore.store;
-}
+};
 
 export const migratePluginSettings = (name: string, ...oldNames: string[]) => {
     const { plugins } = SettingsStore.plain;
@@ -125,49 +146,70 @@ export const migratePluginSettings = (name: string, ...oldNames: string[]) => {
 
     for (const oldName of oldNames) {
         if (oldName in plugins) {
-            logger.info(`Migrating settings from old name ${oldName} to ${name}`);
+            logger.info(
+                `Migrating settings from old name ${oldName} to ${name}`
+            );
             plugins[name] = plugins[oldName];
             delete plugins[oldName];
             SettingsStore.markAsChanged();
             break;
         }
     }
-}
+};
 
-export const migratePluginSetting = (pluginName: string, oldSetting: string, newSetting: string) => {
+export const migratePluginSetting = (
+    pluginName: string,
+    oldSetting: string,
+    newSetting: string
+) => {
     const settings = SettingsStore.plain.plugins[pluginName];
     if (!settings) {
         return;
     }
 
-    if (!Object.hasOwn(settings, oldSetting) || Object.hasOwn(settings, newSetting)) {
+    if (
+        !Object.hasOwn(settings, oldSetting) ||
+        Object.hasOwn(settings, newSetting)
+    ) {
         return;
     }
 
     settings[newSetting] = settings[oldSetting];
     delete settings[oldSetting];
     SettingsStore.markAsChanged();
-}
+};
 
-export function definePluginSettings<Def extends SettingsDefinition, Checks extends SettingsChecks<Def>, PrivateSettings extends object = {}>(def: Def, checks?: Checks) {
+export function definePluginSettings<
+    Def extends SettingsDefinition,
+    Checks extends SettingsChecks<Def>,
+    PrivateSettings extends object = {}
+>(def: Def, checks?: Checks) {
     const definedSettings: DefinedSettings<Def, Checks, PrivateSettings> = {
         get store() {
             if (!definedSettings.pluginName) {
-                throw new Error("Cannot access settings before plugin is initialized");
+                throw new Error(
+                    "Cannot access settings before plugin is initialized"
+                );
             }
             return Settings.plugins[definedSettings.pluginName] as any;
         },
         get plain() {
             if (!definedSettings.pluginName) {
-                throw new Error("Cannot access settings before plugin is initialized");
+                throw new Error(
+                    "Cannot access settings before plugin is initialized"
+                );
             }
             return PlainSettings.plugins[definedSettings.pluginName] as any;
         },
-        use: settings => {
-            return useSettings(settings?.map(name => `plugins.${definedSettings.pluginName}.${name}`) as UseSettings<Settings>[]).plugins[definedSettings.pluginName] as any;
+        use: (settings) => {
+            return useSettings(
+                settings?.map(
+                    (name) => `plugins.${definedSettings.pluginName}.${name}`
+                ) as UseSettings<Settings>[]
+            ).plugins[definedSettings.pluginName] as any;
         },
         def,
-        checks: checks ?? {} as any,
+        checks: checks ?? ({} as any),
         pluginName: "",
         withPrivateSettings<T extends object>() {
             return this as DefinedSettings<Def, Checks, T>;
@@ -193,13 +235,12 @@ function mergeDefaults<T>(obj: T, defaults: T): T {
 type UseSettings<T extends object> = ResolveUseSettings<T>[keyof T];
 
 type ResolveUseSettings<T extends object> = {
-    [Key in keyof T]:
-        Key extends string
-            ? T[Key] extends Record<string, unknown>
-                ? UseSettings<T[Key]> extends string
-                    // @ts-ignore "Type instantiation is excessively deep and possibly infinite"
-                    ? `${Key}.${UseSettings<T[Key]>}`
-                    : never
-                : Key
-            : never;
+    [Key in keyof T]: Key extends string
+        ? T[Key] extends Record<string, unknown>
+            ? UseSettings<T[Key]> extends string
+                ? // @ts-ignore "Type instantiation is excessively deep and possibly infinite"
+                  `${Key}.${UseSettings<T[Key]>}`
+                : never
+            : Key
+        : never;
 };

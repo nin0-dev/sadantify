@@ -9,16 +9,21 @@ type Props = {
     maxLength?: number;
     value?: string;
     disabled?: boolean;
-    type?: "text" | "number"
+    type?: "text" | "number";
     onChange?: (v: string) => void;
-}
+};
 
 export default (props: Props) => {
     return (
         <div className="ext-text-input-container">
             {props.label && (
                 <label htmlFor={props.id} className="ext-text-input-label">
-                    <Text variant="marginalBold" className="ext-text-input-label-content">{props.label}</Text>
+                    <Text
+                        variant="marginalBold"
+                        className="ext-text-input-label-content"
+                    >
+                        {props.label}
+                    </Text>
                 </label>
             )}
             <input
@@ -26,7 +31,7 @@ export default (props: Props) => {
                 id={props.id}
                 dir="auto"
                 className="ext-text-input-input"
-                onChange={e => props.onChange?.(e.target.value)}
+                onChange={(e) => props.onChange?.(e.target.value)}
                 placeholder={props.placeholder}
                 maxLength={props.maxLength}
                 value={props.value}
@@ -34,4 +39,4 @@ export default (props: Props) => {
             />
         </div>
     );
-}
+};

@@ -1,15 +1,24 @@
 import { proxyLazy } from "@utils/lazy";
 import { StartAt } from "@utils/types";
-import { ConnectDevicesAPI, Platform, PlaybackAPI, PlayerAPI } from "@webpack/types";
+import {
+    ConnectDevicesAPI,
+    Platform,
+    PlaybackAPI,
+    PlayerAPI
+} from "@webpack/types";
 import { createEventListeners, startAllPlugins } from "plugins";
 
 const findApiLazy = <T>(name: string): T => {
-    const proxy = proxyLazy((): T => {
-        if (!platform) {
-            return null as T;
-        }
-        return platform.getRegistry().resolve(Symbol.for(name)) as T;
-    }, 5, false);
+    const proxy = proxyLazy(
+        (): T => {
+            if (!platform) {
+                return null as T;
+            }
+            return platform.getRegistry().resolve(Symbol.for(name)) as T;
+        },
+        5,
+        false
+    );
     if (IS_DEV) {
         window[name] = proxy;
     }

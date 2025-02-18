@@ -21,9 +21,17 @@ export interface WebpackInstance {
      */
     m: {
         [id: number]: {
-            (e: { exports: any, id: number, loaded: boolean }, ret: object, req: WebpackInstance): void;
-            original: (e: { exports: any, id: number, loaded: boolean }, ret: object, req: WebpackInstance) => void;
-        }
+            (
+                e: { exports: any; id: number; loaded: boolean },
+                ret: object,
+                req: WebpackInstance
+            ): void;
+            original: (
+                e: { exports: any; id: number; loaded: boolean },
+                ret: object,
+                req: WebpackInstance
+            ) => void;
+        };
     };
     /**
      * Returns the bundle path.
@@ -34,4 +42,4 @@ export interface WebpackInstance {
      * Falls back to `return e + "js"`.
      */
     u: (e: any) => string;
-};
+}

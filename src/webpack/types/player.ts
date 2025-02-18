@@ -3,7 +3,10 @@ import { Identifiable, LoggingParams } from "./spotify";
 
 export interface PlayerAPI {
     forcedShuffle: boolean;
-    addToQueue(elements: { uid?: string; uri?: string; }[], loggingParams?: LoggingParams): Promise<void>;
+    addToQueue(
+        elements: { uid?: string; uri?: string }[],
+        loggingParams?: LoggingParams
+    ): Promise<void>;
     canPlayEncryptedContent(): Promise<boolean>;
     /**
      * Checks if {@param signal} is in {@link PlayerState.signals}.
@@ -35,7 +38,7 @@ export interface PlayerAPI {
     skipToNext(): Promise<void>;
     skipToPrevious(): Promise<void>;
     updateContext(e, t, n): Promise<void>;
-};
+}
 
 export interface PlayerState {
     context: {
@@ -72,36 +75,40 @@ export interface PlayerState {
     speed: number;
     speedEsperanto: number;
     timestamp: number;
-};
+}
 
 export enum Repeat {
     NONE = 0,
     CONTEXT = 1,
     SONG = 2
-};
+}
 
 export interface PlayerEvents {
     emitPauseSync(): any;
-    emitPlaySync(context: {
-        playlistQueryOptions: {
-            filter: string;
-            isExtraColumnsEnabled: boolean;
-            limit: number;
-            offset: number;
-        };
-        sort: {
-            field: string;
-            order: string;
-        };
-        uri: string;
-    }, origin: {
-        featureIdentifier: string;
-        referrerIdentifier: string;
-    }, options: {
-        loggingParams: LoggingParams;
-        shuffle: boolean;
-        skipTo?: Identifiable;
-    }): any;
+    emitPlaySync(
+        context: {
+            playlistQueryOptions: {
+                filter: string;
+                isExtraColumnsEnabled: boolean;
+                limit: number;
+                offset: number;
+            };
+            sort: {
+                field: string;
+                order: string;
+            };
+            uri: string;
+        },
+        origin: {
+            featureIdentifier: string;
+            referrerIdentifier: string;
+        },
+        options: {
+            loggingParams: LoggingParams;
+            shuffle: boolean;
+            skipTo?: Identifiable;
+        }
+    ): any;
     emitQueueActionComplete(action: QueueAction, error?: Error): any;
     emitQueueActionSync(action: QueueAction): any;
     emitQueueUpdate(queueState: QueueState): any;
@@ -111,8 +118,12 @@ export interface PlayerEvents {
     /**
      * @returns A callback that removes the listener when called.
      */
-    addListener(event: PlayerEventType, callback: (e: any) => void, options?: any): () => void;
-};
+    addListener(
+        event: PlayerEventType,
+        callback: (e: any) => void,
+        options?: any
+    ): () => void;
+}
 
 export interface Song {
     album: {
@@ -147,7 +158,7 @@ export interface Song {
     type: "track";
     uid: string;
     uri: string;
-};
+}
 
 export interface PlayerCapabilities {
     canChangeSpeed: boolean;
@@ -155,7 +166,7 @@ export interface PlayerCapabilities {
     canPlayMultipleContextPages: boolean;
     hasDecoratedQueue: boolean;
     maxNextTracks: number;
-};
+}
 
 export enum PlayerEventType {
     UPDATE = "update",
@@ -165,4 +176,4 @@ export enum PlayerEventType {
     QUEUE_ACTION_COMPLETE = "queue_action_complete",
     QUEUE_UPDATE = "queue_update",
     CONTEXT_WRAPAROUND = "context_wraparound"
-};
+}

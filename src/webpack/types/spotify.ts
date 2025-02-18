@@ -77,11 +77,11 @@ export interface Platform {
             clearItem(key: string);
             getItem(key: string);
             setItem(key: string, value: any);
-        }
+        };
     };
     getEventSender(): any;
     /**
-     * Maybe this is a wrapper for Apple's External Accessory Framework. 
+     * Maybe this is a wrapper for Apple's External Accessory Framework.
      */
     getExternalAccessoryAPI(): any;
     /**
@@ -132,11 +132,10 @@ export interface Platform {
      */
     getUBILogger(): any;
     getUrlDispenserServiceClient(): {
-        getShortUrl(uri: string, {
-            utmParameters,
-            customData,
-            linkPreview
-        }): Promise<{
+        getShortUrl(
+            uri: string,
+            { utmParameters, customData, linkPreview }
+        ): Promise<{
             full_url: string;
             share_id: string;
             shareable_url: string;
@@ -151,7 +150,7 @@ export interface Platform {
     operatingSystem: string;
     username: string;
     version: string;
-};
+}
 
 export interface PlatformData {
     app_platform: string;
@@ -186,7 +185,7 @@ export interface PlatformData {
     };
     os_version: string;
     remote_config_client_id: string;
-};
+}
 
 export interface Session {
     accessToken: string;
@@ -195,21 +194,21 @@ export interface Session {
     locale: string;
     market: string;
     valid: boolean;
-};
+}
 
 export interface RemoteConfiguration {
     values: Map<String, any>;
     getValue<T>(key: string): T;
     toJSON(): Record<string, any>;
-};
+}
 
 export interface LoggingParams {
     interactionId?: string;
     pageInstanceId?: string;
-};
+}
 
 export interface Identifiable {
     index?: number;
     uri: string;
     name: string;
-};
+}

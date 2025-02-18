@@ -14,9 +14,21 @@ export let useRef: typeof React.useRef;
 export let useReducer: typeof React.useReducer;
 export let useCallback: typeof React.useCallback;
 
-export const ReactDOM: typeof import("react-dom") & typeof import("react-dom/client") = findByPropsLazy("createPortal", "render");
+export const ReactDOM: typeof import("react-dom") &
+    typeof import("react-dom/client") = findByPropsLazy(
+    "createPortal",
+    "render"
+);
 
-waitFor("useState", m => {
+waitFor("useState", (m) => {
     React = m;
-    ({ useEffect, useState, useLayoutEffect, useMemo, useRef, useReducer, useCallback } = React);
+    ({
+        useEffect,
+        useState,
+        useLayoutEffect,
+        useMemo,
+        useRef,
+        useReducer,
+        useCallback
+    } = React);
 });

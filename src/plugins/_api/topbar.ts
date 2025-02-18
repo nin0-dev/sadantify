@@ -8,7 +8,7 @@ export default definePlugin({
     required: true,
     patches: [
         {
-            find: "\"data-testid\":\"top-bar-back-button\"",
+            find: '"data-testid":"top-bar-back-button"',
             replacement: {
                 match: /(globalNavBarHistoryButtonsContainer\),children:)(\[.*?\])(}\))/,
                 replace: (_, prefix, children, suffix) => {

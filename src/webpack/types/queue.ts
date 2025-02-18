@@ -4,7 +4,7 @@ export interface QueueState {
     current: Song;
     nextUp: Song[];
     queued: Song[];
-};
+}
 
 export enum QueueAction {
     ADD = "add",
@@ -12,4 +12,4 @@ export enum QueueAction {
     CLEAR = "clear",
     INSERT = "insert",
     REORDER = "reorder"
-};
+}

@@ -5,7 +5,7 @@ export interface PlaybackAPI {
     lowerVolume(): Promise<void>;
     raiseVolume(): Promise<void>;
     setVolume(value: number): Promise<void>;
-};
+}
 
 export interface PlaybackInfo {
     advisedBitrate: number;
@@ -27,4 +27,4 @@ export interface PlaybackInfo {
     strategy: string;
     targetBitrate: number;
     targetFileAvailable: boolean;
-};
+}

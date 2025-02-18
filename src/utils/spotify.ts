@@ -22,7 +22,10 @@ export const redirectTo = (path: string) => {
     platform.getHistory().push(path);
 };
 
-export const findTranslation = (value: string, object = platform.getTranslations()): string[] => {
+export const findTranslation = (
+    value: string,
+    object = platform.getTranslations()
+): string[] => {
     const results: string[] = [];
     for (const key in object) {
         const translation = object[key];

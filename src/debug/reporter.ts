@@ -15,14 +15,20 @@ export const runReporter = async () => {
         logger.log("Starting test...");
 
         let loadLazyChunksResolve: (value: void | PromiseLike<void>) => void;
-        const loadLazyChunksDone = new Promise<void>(r => loadLazyChunksResolve = r);
-        
-        Webpack.beforeInitListeners.add(() => loadLazyChunks().then((loadLazyChunksResolve)));
+        const loadLazyChunksDone = new Promise<void>(
+            (r) => (loadLazyChunksResolve = r)
+        );
+
+        Webpack.beforeInitListeners.add(() =>
+            loadLazyChunks().then(loadLazyChunksResolve)
+        );
         await loadLazyChunksDone;
 
         for (const patch of patches) {
             if (!patch.all) {
-                new Logger("WebpackInterceptor").warn(`Patch by ${patch.plugin} found no module (Module id is-): ${patch.find}`);
+                new Logger("WebpackInterceptor").warn(
+                    `Patch by ${patch.plugin} found no module (Module id is-): ${patch.find}`
+                );
             }
         }
 
@@ -51,7 +57,10 @@ export const runReporter = async () => {
 
             let result: any;
             try {
-                if (method === "proxyLazyWebpack" || method === "LazyComponentWebpack") {
+                if (
+                    method === "proxyLazyWebpack" ||
+                    method === "LazyComponentWebpack"
+                ) {
                     const [factory] = args;
                     result = factory();
                 } else if (method === "extractAndLoadChunks") {
@@ -60,31 +69,44 @@ export const runReporter = async () => {
                 } else if (method === "mapMangledModule") {
                     const [code, mapper] = args;
                     result = Webpack.mapMangledModule(code, mapper);
-                    if (Object.keys(result).length !== Object.keys(mapper).length) {
+                    if (
+                        Object.keys(result).length !==
+                        Object.keys(mapper).length
+                    ) {
                         throw new Error("Webpack find fail");
                     }
                 } else {
                     result = Webpack[method](...args);
                 }
 
-                if (result === null || (result.$$extendifyInternal !== null && result.$$extendifyInternal() === null)) {
+                if (
+                    result === null ||
+                    (result.$$extendifyInternal !== null &&
+                        result.$$extendifyInternal() === null)
+                ) {
                     throw new Error("Webpack find fail");
                 }
             } catch (e) {
                 let logMessage = searchType;
-                if (method === "find" || method === "proxyLazyWebpack" || method === "LazyComponentWebpack") {
+                if (
+                    method === "find" ||
+                    method === "proxyLazyWebpack" ||
+                    method === "LazyComponentWebpack"
+                ) {
                     if (args[0].$$extendifyProps !== null) {
-                        logMessage += `(${args[0].$$extendifyProps.map(arg => `"${arg}"`).join(", ")})`;
+                        logMessage += `(${args[0].$$extendifyProps.map((arg) => `"${arg}"`).join(", ")})`;
                     } else {
                         logMessage += `(${args[0].toString().slice(0, 147)}...)`;
                     }
                 } else if (method === "extractAndLoadChunks") {
-                    logMessage += `([${args[0].map(arg => `"${arg}"`).join(", ")}])`;
+                    logMessage += `([${args[0].map((arg) => `"${arg}"`).join(", ")}])`;
                 } else if (method === "mapMangledModule") {
-                    const failedMappings = Object.keys(args[1]).filter(key => result?.key === null);
-                    logMessage += `("${args[0]}", {\n${failedMappings.map(mapping => `\t${mapping}: ${args[1][mapping].toString().slice(0, 147)}...`).join(",\n")}\n})`;
+                    const failedMappings = Object.keys(args[1]).filter(
+                        (key) => result?.key === null
+                    );
+                    logMessage += `("${args[0]}", {\n${failedMappings.map((mapping) => `\t${mapping}: ${args[1][mapping].toString().slice(0, 147)}...`).join(",\n")}\n})`;
                 } else {
-                    logMessage += `${args.map(arg => `"${arg}"`).join(", ")}`;
+                    logMessage += `${args.map((arg) => `"${arg}"`).join(", ")}`;
                 }
 
                 logger.log("Webpack find fail:", logMessage);
@@ -95,4 +117,4 @@ export const runReporter = async () => {
     } catch (e) {
         logger.log("A fatal error occured:", e);
     }
-}
+};

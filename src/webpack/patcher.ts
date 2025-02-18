@@ -7,7 +7,15 @@ import { WEBPACK_CHUNK } from "@utils/constants";
 import { Logger } from "@utils/logger";
 import { canonicalizeReplacement } from "@utils/patches";
 import { PatchReplacement } from "@utils/types";
-import { _initWebpack, beforeInitListeners, factoryListeners, moduleListeners, shouldIgnoreModule, subscriptions, wreq } from "@webpack";
+import {
+    _initWebpack,
+    beforeInitListeners,
+    factoryListeners,
+    moduleListeners,
+    shouldIgnoreModule,
+    subscriptions,
+    wreq
+} from "@webpack";
 import { traceFunction } from "debug/tracer";
 import { patches } from "plugins";
 import { WebpackInstance } from "./types";
@@ -19,7 +27,7 @@ let webpackChunk: any[];
 Object.defineProperty(window, WEBPACK_CHUNK, {
     configurable: true,
     get: () => webpackChunk,
-    set: v => {
+    set: (v) => {
         if (v?.push) {
             if (!v.push.$$extendifyOriginal) {
                 logger.info(`Patching ${WEBPACK_CHUNK}.push`);
@@ -62,16 +70,21 @@ Object.defineProperty(Function.prototype, "m", {
                     return;
                 }
 
-                logger.info("Main Webpack found, initializing internal references to WebpackRequire");
+                logger.info(
+                    "Main Webpack found, initializing internal references to WebpackRequire"
+                );
                 _initWebpack(this);
-                
+
                 for (const listener of beforeInitListeners) {
                     listener(this);
                 }
             }
         });
-        
-        const setterTimeout = setTimeout(() => Reflect.deleteProperty(this, "p"), 0);
+
+        const setterTimeout = setTimeout(
+            () => Reflect.deleteProperty(this, "p"),
+            0
+        );
     }
 });
 
@@ -83,35 +96,49 @@ const patchPush = (webpackGlobal: any) => {
             logger.error("Error in handlePush", e);
         }
         return handlePush.$$extendifyOriginal.call(webpackGlobal, chunk);
-    }
+    };
 
     handlePush.$$extendifyOriginal = webpackGlobal.push;
-    handlePush.toString = handlePush.$$extendifyOriginal.toString.bind(handlePush.$$extendifyOriginal);
-    handlePush.bind = (...args: unknown[]) => handlePush.$$extendifyOriginal.bind(...args);
+    handlePush.toString = handlePush.$$extendifyOriginal.toString.bind(
+        handlePush.$$extendifyOriginal
+    );
+    handlePush.bind = (...args: unknown[]) =>
+        handlePush.$$extendifyOriginal.bind(...args);
 
     Object.defineProperty(webpackGlobal, "push", {
         configurable: true,
         get: () => handlePush,
-        set: v => {
+        set: (v) => {
             handlePush.$$extendifyOriginal = v;
         }
     });
-}
+};
 
 let webpackNotInitializedLogged = false;
 
-const patchFactories = (factories: Record<string, (module: any, exports: any, require: WebpackInstance) => void>) => {
+const patchFactories = (
+    factories: Record<
+        string,
+        (module: any, exports: any, require: WebpackInstance) => void
+    >
+) => {
     for (const id in factories) {
         let mod = factories[id];
 
         const originalMod = mod;
         const patchedBy = new Set();
 
-        const factory = factories[id] = function(module: any, exports: any, require: WebpackInstance) {
+        const factory = (factories[id] = function (
+            module: any,
+            exports: any,
+            require: WebpackInstance
+        ) {
             if (wreq === null && IS_DEV) {
                 if (!webpackNotInitializedLogged) {
                     webpackNotInitializedLogged = true;
-                    logger.error("WebpackRequire was not initialized, running modules without patches instead.");
+                    logger.error(
+                        "WebpackRequire was not initialized, running modules without patches instead."
+                    );
                 }
                 return void originalMod(module, exports, require);
             }
@@ -145,7 +172,11 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
                 try {
                     callback(exports, id);
                 } catch (e) {
-                    logger.error("Error in Webpack module listener:", e, callback);
+                    logger.error(
+                        "Error in Webpack module listener:",
+                        e,
+                        callback
+                    );
                 }
             }
 
@@ -168,7 +199,12 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
                         }
                     }
                 } catch (e) {
-                    logger.error("Error while firing callback for Webpack subscription:", e, filter, callback);
+                    logger.error(
+                        "Error while firing callback for Webpack subscription:",
+                        e,
+                        filter,
+                        callback
+                    );
                 }
             }
         } as any as {
@@ -176,7 +212,7 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
             $$extendifyPatchedSource?: string;
             original: any;
             toString: () => string;
-        };
+        });
 
         factory.toString = originalMod.toString.bind(originalMod);
         factory.original = originalMod;
@@ -185,7 +221,11 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
             try {
                 factoryListener(originalMod);
             } catch (e) {
-                logger.error("Error in Webpack factory listener:", e, factoryListener);
+                logger.error(
+                    "Error in Webpack factory listener:",
+                    e,
+                    factoryListener
+                );
             }
         }
 
@@ -194,14 +234,21 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
         for (let i = 0; i < patches.length; i++) {
             const patch = patches[i];
 
-            const moduleMatches = typeof patch.find === "string" ? code.includes(patch.find) : patch.find.test(code);
+            const moduleMatches =
+                typeof patch.find === "string"
+                    ? code.includes(patch.find)
+                    : patch.find.test(code);
             if (!moduleMatches) {
                 continue;
             }
 
             patchedBy.add(patch.plugin);
 
-            const executePatch = traceFunction(`patch by ${patch.plugin}`, (match: string | RegExp, replace: string) => code.replace(match, replace));
+            const executePatch = traceFunction(
+                `patch by ${patch.plugin}`,
+                (match: string | RegExp, replace: string) =>
+                    code.replace(match, replace)
+            );
             const previousMod = mod;
             const previousCode = code;
 
@@ -212,17 +259,24 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
                 canonicalizeReplacement(replacement, patch.plugin);
 
                 try {
-                    const newCode = executePatch(replacement.match, replacement.replace as string);
+                    const newCode = executePatch(
+                        replacement.match,
+                        replacement.replace as string
+                    );
                     if (newCode === code) {
                         if (!patch.noWarn) {
-                            logger.warn(`Patch by ${patch.plugin} had no effect (Module id is ${id}): ${replacement.match}`);
+                            logger.warn(
+                                `Patch by ${patch.plugin} had no effect (Module id is ${id}): ${replacement.match}`
+                            );
                             if (IS_DEV) {
                                 logger.debug("Function source:", code);
                             }
                         }
 
                         if (patch.group) {
-                            logger.warn(`Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} had no effect`);
+                            logger.warn(
+                                `Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} had no effect`
+                            );
                             mod = previousMod;
                             code = previousCode;
                             patchedBy.delete(patch.plugin);
@@ -233,45 +287,75 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
                     }
 
                     code = newCode;
-                    mod = (0, eval)(`// Webpack Module ${id} - Patched by ${[...patchedBy].join(", ")}\n${newCode}\n//# sourceURL=https://xpui.app.spotify.com/patched/WebpackModule${id}.js`);
+                    mod = (0, eval)(
+                        `// Webpack Module ${id} - Patched by ${[...patchedBy].join(", ")}\n${newCode}\n//# sourceURL=https://xpui.app.spotify.com/patched/WebpackModule${id}.js`
+                    );
                 } catch (e) {
-                    logger.error(`Patch by ${patch.plugin} errored (Module id is ${id}): ${replacement.match}`, e);
+                    logger.error(
+                        `Patch by ${patch.plugin} errored (Module id is ${id}): ${replacement.match}`,
+                        e
+                    );
 
                     if (IS_DEV) {
-                        (async function() {
+                        (async function () {
                             const changeSize = code.length - lastCode.length;
                             const match = lastCode.match(replacement.match)!;
-    
+
                             // Use 200 surrounding characters of context
                             const start = Math.max(0, match.index! - 200);
-                            const end = Math.min(lastCode.length, match.index! + match[0].length + 200);
+                            const end = Math.min(
+                                lastCode.length,
+                                match.index! + match[0].length + 200
+                            );
                             // (changeSize may be negative)
                             const endPatched = end + changeSize;
-    
+
                             const context = lastCode.slice(start, end);
-                            const patchedContext = code.slice(start, endPatched);
+                            const patchedContext = code.slice(
+                                start,
+                                endPatched
+                            );
 
                             // Inline import to avoid it bundling it in production
-                            const diff = (await import("diff")).diffWordsWithSpace(context, patchedContext);
+                            const diff = (
+                                await import("diff")
+                            ).diffWordsWithSpace(context, patchedContext);
                             let fmt = "%c %s ";
                             const elements = [] as string[];
                             for (const d of diff) {
-                                const color = d.removed ? "red" : d.added ? "lime" : "grey";
+                                const color = d.removed
+                                    ? "red"
+                                    : d.added
+                                      ? "lime"
+                                      : "grey";
                                 fmt += "%c%s";
                                 elements.push("color:" + color, d.value);
                             }
 
-                            logger.errorCustomFmt(...Logger.makeTitle("white", "Before"), context);
-                            logger.errorCustomFmt(...Logger.makeTitle("white", "After"), patchedContext);
-                            const [titleFmt, ...titleElements] = Logger.makeTitle("white", "Diff");
-                            logger.errorCustomFmt(titleFmt + fmt, ...titleElements, ...elements);
+                            logger.errorCustomFmt(
+                                ...Logger.makeTitle("white", "Before"),
+                                context
+                            );
+                            logger.errorCustomFmt(
+                                ...Logger.makeTitle("white", "After"),
+                                patchedContext
+                            );
+                            const [titleFmt, ...titleElements] =
+                                Logger.makeTitle("white", "Diff");
+                            logger.errorCustomFmt(
+                                titleFmt + fmt,
+                                ...titleElements,
+                                ...elements
+                            );
                         })();
                     }
 
                     patchedBy.delete(patch.plugin);
 
                     if (patch.group) {
-                        logger.warn(`Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} errored`);
+                        logger.warn(
+                            `Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} errored`
+                        );
                         mod = previousMod;
                         code = previousCode;
                         break;
@@ -293,9 +377,10 @@ const patchFactories = (factories: Record<string, (module: any, exports: any, re
             } else if (wreq) {
                 const existingFactory = wreq.m[id];
                 if (existingFactory) {
-                    factory.$$extendifyPatchedSource = existingFactory.$$extendifyPatchedSource;
+                    factory.$$extendifyPatchedSource =
+                        existingFactory.$$extendifyPatchedSource;
                 }
             }
         }
     }
-}
+};

@@ -22,7 +22,9 @@ async function init() {
     startAllPlugins(StartAt.WebpackReady);
 
     if (IS_DEV) {
-        const pendingPatches = patches.filter(p => !p.all && p.predicate?.() !== false);
+        const pendingPatches = patches.filter(
+            (p) => !p.all && p.predicate?.() !== false
+        );
         if (pendingPatches.length) {
             new Logger("PluginManager", "#a6d189").warn(
                 "Webpack has finished initializing, but some patches haven't been applied yet.",
@@ -30,7 +32,10 @@ async function init() {
                 "that all plugins are working as intended.",
                 "You are seeing this warning because this is a Development build of Extendify.",
                 "\nThe following patches have not been applied:",
-                "\n\n" + pendingPatches.map(p => `${p.plugin}: ${p.find}`).join("\n")
+                "\n\n" +
+                    pendingPatches
+                        .map((p) => `${p.plugin}: ${p.find}`)
+                        .join("\n")
             );
         }
     }
@@ -39,6 +44,10 @@ async function init() {
 startAllPlugins(StartAt.Init);
 init();
 
-document.addEventListener("DOMContentLoaded", () => {
-    startAllPlugins(StartAt.DOMContentLoaded);
-}, { once: true });
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        startAllPlugins(StartAt.DOMContentLoaded);
+    },
+    { once: true }
+);

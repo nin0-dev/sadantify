@@ -16,7 +16,7 @@ export default definePlugin({
                 replace: (_, c) => {
                     return `))),Extendify.Webpack.Common._loadPlatform({version${c})}}`;
                 }
-            } 
+            }
         }
     ],
     events: {

@@ -7,13 +7,16 @@ import CloseIcon from "./icons/CloseIcon";
 const createRandomString = (length: number): string => {
     let result = "";
     let counter = 0;
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     while (counter < length) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
+        result += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+        );
         counter += 1;
     }
     return result;
-}
+};
 
 type Props = PropsWithChildren<{
     animationMs?: number;
@@ -32,23 +35,33 @@ export const ModalComponent = (props: Props) => {
         }
 
         let keyListener: (e: KeyboardEvent) => any;
-        window.addEventListener("keyup", keyListener = (e => {
-            if (e.key === "Escape" && props.isOpen) {
-                props.onClose?.();
-                removeEventListener("keyup", keyListener);
-                e.preventDefault();
-            }
-        }));
+        window.addEventListener(
+            "keyup",
+            (keyListener = (e) => {
+                if (e.key === "Escape" && props.isOpen) {
+                    props.onClose?.();
+                    removeEventListener("keyup", keyListener);
+                    e.preventDefault();
+                }
+            })
+        );
 
         let mouseListener: (e: MouseEvent) => any;
-        window.addEventListener("mouseup", mouseListener = (e => {
-            const children = (e.target as HTMLElement)?.children;
-            if (children.length > 0 && children[0].id === id && props.isOpen) {
-                props.onClose?.();
-                removeEventListener("mouseup", mouseListener);
-                e.preventDefault();
-            }
-        }));
+        window.addEventListener(
+            "mouseup",
+            (mouseListener = (e) => {
+                const children = (e.target as HTMLElement)?.children;
+                if (
+                    children.length > 0 &&
+                    children[0].id === id &&
+                    props.isOpen
+                ) {
+                    props.onClose?.();
+                    removeEventListener("mouseup", mouseListener);
+                    e.preventDefault();
+                }
+            })
+        );
     }, [props]);
 
     return (
@@ -56,22 +69,30 @@ export const ModalComponent = (props: Props) => {
             id={id}
             className={props.className}
             animated={!!props.animationMs && props.animationMs > 0}
-            animation={!!props.animationMs ? { closeTimeoutMs: props.animationMs } : undefined}
+            animation={
+                !!props.animationMs
+                    ? { closeTimeoutMs: props.animationMs }
+                    : undefined
+            }
             isOpen={props.isOpen}
         >
             <div className="ext-modal-container">
                 <div className="ext-modal-header">
-                    <Text as="h1" semanticColor="textBase" variant="titleMedium">{props.title}</Text>
+                    <Text
+                        as="h1"
+                        semanticColor="textBase"
+                        variant="titleMedium"
+                    >
+                        {props.title}
+                    </Text>
                     <ButtonTertiary
                         aria-label="Close"
                         iconOnly={() => <CloseIcon />}
                         onClick={(_: any) => props.onClose?.()}
                     />
                 </div>
-                <div className="ext-modal-content">
-                    {props.children}
-                </div>
+                <div className="ext-modal-content">{props.children}</div>
             </div>
         </ModalWrapper>
     );
-}
+};

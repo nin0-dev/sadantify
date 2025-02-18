@@ -19,11 +19,13 @@ Requires installing Spotify from the installer. (**NOT THE MICROSOFT STORE!**)
 Currently the `applyPatch.mjs` script only suppoorts windows.
 
 To build, enable devtools and patch Spotify, run:
+
 ```bash
 $ npm run dev
 ```
 
 To undo the patch, run:
+
 ```bash
 $ npm run unpatch
 ```

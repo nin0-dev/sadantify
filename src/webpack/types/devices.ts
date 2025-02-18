@@ -40,4 +40,4 @@ export interface Device {
     supportsLogout: boolean;
     type: string;
     volume: number;
-};
+}

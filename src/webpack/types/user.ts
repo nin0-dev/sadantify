@@ -5,4 +5,4 @@ export interface User {
     type: "user";
     uri: string;
     username: string;
-};
+}

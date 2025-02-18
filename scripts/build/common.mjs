@@ -17,33 +17,42 @@ import { exists } from "../utils.mjs";
 const Package = JSON.parse(readFileSync("package.json"));
 
 export const VERSION = Package.version;
-export const BUILD_TIMESTAMP = Number(process.env.SOURCE_DATE_EPOCH) || Date.now();
+export const BUILD_TIMESTAMP =
+    Number(process.env.SOURCE_DATE_EPOCH) || Date.now();
 
 export const watch = process.argv.includes("--watch");
 export const IS_DEV = watch || process.argv.includes("--dev");
 export const IS_REPORTER = process.argv.includes("--reporter");
 export const IS_STANDALONE = process.argv.includes("--standalone");
 
-const PluginDefinitionNameMatcher = /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
+const PluginDefinitionNameMatcher =
+    /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
 /**
  * @param {string} base
  * @param {import("fs").Dirent} dirent
  */
 export const resolvePluginName = async (base, dirent) => {
     const fullPath = join(base, dirent.name);
-    const content = dirent.isFile() ? await readFile(fullPath, "utf-8") : await (async () => {
-        for (const file of ["index.ts", "index.tsx"]) {
-            try {
-                return await readFile(join(fullPath, file), "utf-8");
-            } catch {
-                continue;
-            }
-        }
-    });
-    return PluginDefinitionNameMatcher.exec(content)?.[3] ?? (() => {
-        throw new Error(`Invalid plugin ${fullPath}: must contain definePlugin call with simple striung name property as first property`);
-    })();
-}
+    const content = dirent.isFile()
+        ? await readFile(fullPath, "utf-8")
+        : await (async () => {
+              for (const file of ["index.ts", "index.tsx"]) {
+                  try {
+                      return await readFile(join(fullPath, file), "utf-8");
+                  } catch {
+                      continue;
+                  }
+              }
+          });
+    return (
+        PluginDefinitionNameMatcher.exec(content)?.[3] ??
+        (() => {
+            throw new Error(
+                `Invalid plugin ${fullPath}: must contain definePlugin call with simple striung name property as first property`
+            );
+        })()
+    );
+};
 
 // https://github.com/evanw/esbuild/issues/619#issuecomment-751995294
 /**
@@ -51,28 +60,36 @@ export const resolvePluginName = async (base, dirent) => {
  */
 export const makeAllPackagesExternalPlugin = {
     name: "make-all-packages-external",
-    setup: build => {
+    setup: (build) => {
         const filter = /^[^./]|^\.[^./]|^\.\.[^/]/; // Must not start with "/" or "./" or "../"
-        build.onResolve({ filter }, args => ({ path: args.path, external: true }));
+        build.onResolve({ filter }, (args) => ({
+            path: args.path,
+            external: true
+        }));
     }
-}
+};
 
 /**
  * @type {import("esbuild").Plugin}
  */
 export const globPlugins = {
     name: "glob-plugins",
-    setup: build => {
+    setup: (build) => {
         const filter = /^~plugins$/;
-        build.onResolve({ filter }, args => {
+        build.onResolve({ filter }, (args) => {
             return {
                 namespace: "import-plugins",
                 path: args.path
-            }
+            };
         });
 
         build.onLoad({ filter, namespace: "import-plugins" }, async () => {
-            const pluginDirs = ["plugins", "plugins/_core", "plugins/_api", "userplugins"];
+            const pluginDirs = [
+                "plugins",
+                "plugins/_core",
+                "plugins/_api",
+                "userplugins"
+            ];
 
             let code = "";
             let pluginsCode = "\n";
@@ -82,18 +99,25 @@ export const globPlugins = {
                 const userPlugin = dir === "userplugins";
 
                 const fullDir = `./src/${dir}`;
-                if (!await exists(fullDir)) {
+                if (!(await exists(fullDir))) {
                     continue;
                 }
 
                 const files = await readdir(fullDir, { withFileTypes: true });
                 for (const file of files) {
                     const fileName = file.name;
-                    if (fileName.startsWith("_") || fileName.startsWith(".") || fileName === "index.ts") {
+                    if (
+                        fileName.startsWith("_") ||
+                        fileName.startsWith(".") ||
+                        fileName === "index.ts"
+                    ) {
                         continue;
                     }
 
-                    const folderName = `src/${dir}/${fileName}`.replace(/^src\/plugins\//, "");
+                    const folderName = `src/${dir}/${fileName}`.replace(
+                        /^src\/plugins\//,
+                        ""
+                    );
                     const mod = `p${i}`;
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
                     pluginsCode += `[${mod}.name]:${mod},\n`;
@@ -115,54 +139,65 @@ export const globPlugins = {
  */
 export const fileUrlPlugin = {
     name: "file-uri-plugin",
-    setup: build => {
+    setup: (build) => {
         const filter = /^file:\/\/.+$/;
-        build.onResolve({ filter }, args => ({
+        build.onResolve({ filter }, (args) => ({
             namespace: "file-uri",
             path: args.path,
             pluginData: {
                 uri: args.path,
-                path: join(args.resolveDir, args.path.slice("file://".length).split("?")[0])
+                path: join(
+                    args.resolveDir,
+                    args.path.slice("file://".length).split("?")[0]
+                )
             }
         }));
 
-        build.onLoad({ filter, namespace: "file-uri" }, async ({ pluginData: { path, uri } }) => {
-            const { searchParams } = new URIError(uri);
-            const base64 = searchParams.has("base64");
-            const minify = searchParams.has("minify");
-            const noTrim = searchParams.get("trim") === "false";
+        build.onLoad(
+            { filter, namespace: "file-uri" },
+            async ({ pluginData: { path, uri } }) => {
+                const { searchParams } = new URIError(uri);
+                const base64 = searchParams.has("base64");
+                const minify = searchParams.has("minify");
+                const noTrim = searchParams.get("trim") === "false";
 
-            const encoding = base64 ? "base64" : "utf-8";
+                const encoding = base64 ? "base64" : "utf-8";
 
-            let content;
-            if (!minify) {
-                content = await readFile(path, encoding);
-                if (!noTrim) {
-                    content = content.trimEnd();
-                }
-            } else {
-                if (path.endsWith(".html")) {
-                    content = await minifyHtml(await readFile(path, "utf-8"), commonMinifyOpts);
-                } else if (/[mc]?[jt]sx?$/.test(path)) {
-                    const res = await esbuild.build({
-                        entryPoints: [path],
-                        write: false,
-                        minify: true
-                    });
-                    content = res.outputFiles[0].text;
+                let content;
+                if (!minify) {
+                    content = await readFile(path, encoding);
+                    if (!noTrim) {
+                        content = content.trimEnd();
+                    }
                 } else {
-                    throw new Error(`Don't know how to minify file type: ${path}`);
+                    if (path.endsWith(".html")) {
+                        content = await minifyHtml(
+                            await readFile(path, "utf-8"),
+                            commonMinifyOpts
+                        );
+                    } else if (/[mc]?[jt]sx?$/.test(path)) {
+                        const res = await esbuild.build({
+                            entryPoints: [path],
+                            write: false,
+                            minify: true
+                        });
+                        content = res.outputFiles[0].text;
+                    } else {
+                        throw new Error(
+                            `Don't know how to minify file type: ${path}`
+                        );
+                    }
+
+                    if (base64) {
+                        content = Buffer.from(content).toString("base64");
+                    }
                 }
 
-                if (base64) {
-                    content = Buffer.from(content).toString("base64");
-                }
+                return {
+                    contents: `export default ${JSON.stringify(content)}`
+                };
             }
-
-            return {
-                contents: `export default ${JSON.stringify(content)}`
-            };
-        });
+        );
     }
 };
 
@@ -171,14 +206,16 @@ export const fileUrlPlugin = {
  */
 export const banImportPlugin = (filter, message) => ({
     name: "ban-imports",
-    setup: build => {
+    setup: (build) => {
         build.onResolve({ filter }, () => {
             return { errors: [{ text: message }] };
         });
     }
 });
 
-const escapedBuiltinModules = builtinModules.map(m => m.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join("|");
+const escapedBuiltinModules = builtinModules
+    .map((m) => m.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"))
+    .join("|");
 const builtinModuleRegex = new RegExp(`^(node:)?(${escapedBuiltinModules})$`);
 
 /**
@@ -213,9 +250,15 @@ export const commonMinifyOpts = {
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
     useShortDoctype: true
-}
+};
 
 export const commonRendererPlugins = [
-    banImportPlugin(builtinModuleRegex, "Cannot import node inbuilt modules in browser code. You need to use a native.ts file"),
-    banImportPlugin(/^react$/, "Cannot import from react. React and hooks should imported from @webpack/common")
+    banImportPlugin(
+        builtinModuleRegex,
+        "Cannot import node inbuilt modules in browser code. You need to use a native.ts file"
+    ),
+    banImportPlugin(
+        /^react$/,
+        "Cannot import from react. React and hooks should imported from @webpack/common"
+    )
 ];

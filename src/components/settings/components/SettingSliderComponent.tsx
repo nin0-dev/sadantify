@@ -7,14 +7,20 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
         const storeValue = props.pluginSettings[props.id];
         if (storeValue) {
             if (storeValue > 1) {
-                return (storeValue - props.setting.minValue) / props.setting.maxValue;
+                return (
+                    (storeValue - props.setting.minValue) /
+                    props.setting.maxValue
+                );
             }
             return storeValue;
         } else if (props.setting.default) {
-            return (props.setting.default - props.setting.minValue) / props.setting.maxValue;
+            return (
+                (props.setting.default - props.setting.minValue) /
+                props.setting.maxValue
+            );
         }
         return 0;
-    }
+    };
 
     const [state, setState] = React.useState(getDefaultValue());
     const [error, setError] = React.useState<string | null>(null);
@@ -23,12 +29,14 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
 
     const getRealValue = (v: number) => {
         return v * props.setting.maxValue + props.setting.minValue;
-    }
+    };
 
     const onChange = (v: number) => {
         const realValue = getRealValue(v);
 
-        const isValid = props.setting.isValid?.call(props.definedSettings, realValue) ?? true;
+        const isValid =
+            props.setting.isValid?.call(props.definedSettings, realValue) ??
+            true;
         if (typeof isValid === "string") {
             setError(isValid);
         } else if (!isValid) {
@@ -44,17 +52,31 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
     return (
         <div className="ext-plugin-setting-container">
             <div className="ext-plugin-setting-metadata">
-                <Text as="span" semanticColor="textBase" variant="bodyMediumBold">{textToTitle(props.id)}</Text>
-                <Text as="span" semanticColor="textSubdued" variant="bodyMedium">{props.setting.description}</Text>
+                <Text
+                    as="span"
+                    semanticColor="textBase"
+                    variant="bodyMediumBold"
+                >
+                    {textToTitle(props.id)}
+                </Text>
+                <Text
+                    as="span"
+                    semanticColor="textSubdued"
+                    variant="bodyMedium"
+                >
+                    {props.setting.description}
+                </Text>
             </div>
             <div className="ext-plugin-slider-container">
-                <Text as="span" semanticColor="textSubdued" variant="bodySmall">{getRealValue(state).toFixed(0)}</Text>
+                <Text as="span" semanticColor="textSubdued" variant="bodySmall">
+                    {getRealValue(state).toFixed(0)}
+                </Text>
                 <Slider
                     value={state}
                     enableAnimation={true}
-                    onDragStart={v => onChange(v)}
-                    onDragMove={v => onChange(v)}
-                    onDragEnd={v => onChange(v)}
+                    onDragStart={(v) => onChange(v)}
+                    onDragMove={(v) => onChange(v)}
+                    onDragEnd={(v) => onChange(v)}
                     labelText={getRealValue(state).toString()}
                     key={props.id}
                     max={1}
@@ -62,7 +84,11 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
                     isInteractive={true}
                 />
             </div>
-            {error && <Text as="span" semanticColor="textNegative">{error}</Text>}
+            {error && (
+                <Text as="span" semanticColor="textNegative">
+                    {error}
+                </Text>
+            )}
         </div>
     );
-}
+};

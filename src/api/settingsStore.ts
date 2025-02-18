@@ -13,7 +13,9 @@ type ResolvePropDeep<T, P> = P extends `${infer Pre}.${infer Suf}`
     ? Pre extends keyof T
         ? ResolvePropDeep<T[Pre], Suf>
         : any
-    : P extends keyof T ? T[P] : any;
+    : P extends keyof T
+      ? T[P]
+      : any;
 
 interface SettingsStoreOptions {
     readOnly?: boolean;
@@ -26,7 +28,7 @@ interface SettingsStoreOptions {
 }
 
 // merges the SettingsStoreOptions type into the class
-export interface SettingsStore<T extends object> extends SettingsStoreOptions {};
+export interface SettingsStore<T extends object> extends SettingsStoreOptions {}
 
 interface ProxyContext<T extends object = any> {
     root: T;
@@ -128,11 +130,11 @@ export class SettingsStore<T extends object> {
     /**
      * The store object. Making changes to this object will trigger the applicable change listeners
      */
-    public declare store: T;
+    declare public store: T;
     /**
      * The plain data. Changes to this object will not trigger any change listeners
      */
-    public declare plain: T;
+    declare public plain: T;
 
     public constructor(plain: T, options: SettingsStoreOptions = {}) {
         this.plain = plain;
@@ -156,15 +158,20 @@ export class SettingsStore<T extends object> {
         if (paths.length > 2 && paths[0] === "plugins") {
             const settingPath = paths.slice(0, 3);
             const settingPathStr = settingPath.join(".");
-            const settingValue = settingPath.reduce((acc, curr) => acc[curr], root);
+            const settingValue = settingPath.reduce(
+                (acc, curr) => acc[curr],
+                root
+            );
 
-            this.globalListeners.forEach(cb => cb(root, settingPathStr));
-            this.pathListeners.get(settingPathStr)?.forEach(cb => cb && cb(settingValue));
+            this.globalListeners.forEach((cb) => cb(root, settingPathStr));
+            this.pathListeners
+                .get(settingPathStr)
+                ?.forEach((cb) => cb && cb(settingValue));
         } else {
-            this.globalListeners.forEach(cb => cb(root, pathStr));
+            this.globalListeners.forEach((cb) => cb(root, pathStr));
         }
 
-        this.pathListeners.get(pathStr)?.forEach(cb => cb && cb(value));
+        this.pathListeners.get(pathStr)?.forEach((cb) => cb && cb(value));
     }
 
     /**
@@ -189,13 +196,15 @@ export class SettingsStore<T extends object> {
             const path = pathToNotify.split(".");
             for (const p of path) {
                 if (!v) {
-                    console.warn(`Settings#setData: Path ${pathToNotify} does not exist in new data. Not dispatching update`);
+                    console.warn(
+                        `Settings#setData: Path ${pathToNotify} does not exist in new data. Not dispatching update`
+                    );
                     return;
                 }
                 v = v[p];
             }
 
-            this.pathListeners.get(pathToNotify)?.forEach(cb => cb(v));
+            this.pathListeners.get(pathToNotify)?.forEach((cb) => cb(v));
         }
 
         this.markAsChanged();
@@ -225,7 +234,10 @@ export class SettingsStore<T extends object> {
      * @param path
      * @param cb
      */
-    public addChangeListener<P extends LiteralUnion<keyof T, string>>(path: P, cb: (data: ResolvePropDeep<T, P>) => void) {
+    public addChangeListener<P extends LiteralUnion<keyof T, string>>(
+        path: P,
+        cb: (data: ResolvePropDeep<T, P>) => void
+    ) {
         const listeners = this.pathListeners.get(path as string) ?? new Set();
         listeners.add(cb);
         this.pathListeners.set(path as string, listeners);
@@ -243,7 +255,10 @@ export class SettingsStore<T extends object> {
      * Remove a scoped listener
      * @see {@link addChangeListener}
      */
-    public removeChangeListener(path: LiteralUnion<keyof T, string>, cb: (data: any) => void) {
+    public removeChangeListener(
+        path: LiteralUnion<keyof T, string>,
+        cb: (data: any) => void
+    ) {
         const listeners = this.pathListeners.get(path as string);
         if (!listeners) return;
 
@@ -255,6 +270,6 @@ export class SettingsStore<T extends object> {
      * Call all global change listeners
      */
     public markAsChanged() {
-        this.globalListeners.forEach(cb => cb(this.plain, ""));
+        this.globalListeners.forEach((cb) => cb(this.plain, ""));
     }
 }

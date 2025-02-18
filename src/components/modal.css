@@ -4,7 +4,7 @@
     -webkit-box-direction: normal;
     background-color: var(--background-elevated-base);
     border-radius: 8px;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, .3);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
     color: var(--text-base);
     flex-direction: column;
     min-height: 450px;

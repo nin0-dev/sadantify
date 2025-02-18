@@ -6,9 +6,19 @@
  */
 
 import esbuild from "esbuild";
-import { IS_DEV, IS_REPORTER, VERSION, BUILD_TIMESTAMP, commonOpts, globPlugins, commonRendererPlugins, commonMinifyOpts } from "./common.mjs";
+import {
+    IS_DEV,
+    IS_REPORTER,
+    VERSION,
+    BUILD_TIMESTAMP,
+    commonOpts,
+    globPlugins,
+    commonRendererPlugins,
+    commonMinifyOpts
+} from "./common.mjs";
 import { minify as minifyHtml } from "html-minifier-terser";
-import { readFile, writeFile } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
+import { existsSync } from "fs";
 
 const defines = {
     IS_DEV,
@@ -29,13 +39,17 @@ await Promise.all([
         globalName: "Extendify",
         sourcemap: IS_DEV || IS_REPORTER ? "inline" : false,
         define: defines,
-        plugins: [
-            globPlugins,
-            ...commonRendererPlugins
-        ]
+        plugins: [globPlugins, ...commonRendererPlugins]
     }),
-    await writeFile("dist/index.html", await minifyHtml(await readFile("src/index.html", "utf-8"), commonMinifyOpts))
-]).catch(e => {
+    mkdir("dist", { recursive: true }),
+    writeFile(
+        "dist/index.html",
+        await minifyHtml(
+            await readFile("src/index.html", "utf-8"),
+            commonMinifyOpts
+        )
+    )
+]).catch((e) => {
     console.error("Build failed");
     console.error(e.message);
     if (!commonOpts.watch) {
