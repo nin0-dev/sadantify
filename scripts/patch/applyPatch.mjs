@@ -1,5 +1,4 @@
 import JSZip from "jszip";
-import { execFileSync, execSync } from "child_process";
 import { copyFile, readdir, readFile, rm, writeFile } from "fs/promises";
 import { join } from "path";
 import { exists, getSpotifyPath, wrapSpotifyProcess } from "../utils.mjs";

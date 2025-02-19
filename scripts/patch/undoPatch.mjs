@@ -1,4 +1,3 @@
-import { execFileSync, execSync } from "child_process";
 import { readdir, rename, rm } from "fs/promises";
 import { join } from "path";
 import { getSpotifyPath, wrapSpotifyProcess } from "../utils.mjs";
