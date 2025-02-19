@@ -2,7 +2,7 @@ import { Devs } from "@utils/constants";
 import { redirectTo } from "@utils/spotify";
 import { definePlugin } from "@utils/types";
 import { ButtonPrimary } from "@webpack/common";
-import PluginsPageComponent from "components/settings/PluginsPageComponent";
+import ExtendifyPageComponent from "components/settings/ExtendifyPageComponent";
 
 export default definePlugin({
     name: "Settings",
@@ -20,6 +20,6 @@ export default definePlugin({
         )
     },
     pages: {
-        "/extendify": () => <PluginsPageComponent />
+        "/extendify": () => <ExtendifyPageComponent />
     }
 });
