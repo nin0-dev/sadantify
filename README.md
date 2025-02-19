@@ -16,7 +16,7 @@ I also took inspiration from [Spicetify](https://spicetify.app). I just thought 
 
 Requires installing Spotify from the installer. (**NOT THE MICROSOFT STORE!**)
 
-Currently the `applyPatch.mjs` script only suppoorts windows.
+Currently the `applyPatch.mjs` script only supports Windows and Linux (tested on Arch + Hyprland).
 
 To build, enable devtools and patch Spotify, run:
 

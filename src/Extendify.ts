@@ -31,11 +31,8 @@ async function init() {
                 "This might be expected since some Modules are lazy loaded, but please verify",
                 "that all plugins are working as intended.",
                 "You are seeing this warning because this is a Development build of Extendify.",
-                "\nThe following patches have not been applied:",
-                "\n\n" +
-                    pendingPatches
-                        .map((p) => `${p.plugin}: ${p.find}`)
-                        .join("\n")
+                "\nThe following patches have not been applied:\n\n",
+                pendingPatches.map((p) => `${p.plugin}: ${p.find}`).join("\n")
             );
         }
     }
