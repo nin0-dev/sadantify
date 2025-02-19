@@ -3,7 +3,6 @@ import { Settings, SettingsStore } from "@api/settings";
 import { addTopbarElement, removeTopbarElement } from "@api/topbar";
 import { Logger } from "@utils/logger";
 import { canonicalizeFind } from "@utils/patches";
-import { getProgress } from "@utils/spotify";
 import { Patch, Plugin, ReporterTestable, StartAt } from "@utils/types";
 import { player } from "@webpack/common";
 import { PlayerEventType, PlayerState, Song } from "@webpack/types";

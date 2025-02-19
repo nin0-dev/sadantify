@@ -29,6 +29,3 @@ export default definePlugin({
         }
     ]
 });
-
-// 85387.qh = element with path prop
-// 30339.Oi

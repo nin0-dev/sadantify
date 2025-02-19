@@ -26,6 +26,9 @@ export interface Settings {
             [setting: string]: any;
         };
     };
+    theme?: {
+        css: string;
+    };
 }
 
 const DefaultSettings: Settings = {

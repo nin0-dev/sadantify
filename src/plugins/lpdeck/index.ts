@@ -1,49 +1,8 @@
 import { Devs } from "@utils/constants";
-import { definePlugin, OptionType, StartAt } from "@utils/types";
+import { definePlugin, StartAt } from "@utils/types";
 import { ReconnectableWebSocket } from "./ws";
-import { definePluginSettings } from "@api/settings";
 
 const ws = new ReconnectableWebSocket();
-
-const settings = definePluginSettings({
-    stringTest: {
-        type: OptionType.STRING,
-        description: "A test for the 'string' option type."
-    },
-    numberTest: {
-        type: OptionType.NUMBER,
-        description: "A test for the 'number' option type."
-    },
-    bigIntTest: {
-        type: OptionType.BIGINT,
-        description: "A test for the 'bigint' option type."
-    },
-    booleanTest: {
-        type: OptionType.BOOLEAN,
-        description: "A test for the 'boolean' option type."
-    },
-    selectTest: {
-        type: OptionType.SELECT,
-        description: "A test for the 'select' option type.",
-        options: [
-            {
-                label: "Value 1",
-                value: 0
-            },
-            {
-                label: "Value 2",
-                value: 1
-            }
-        ]
-    },
-    sliderTest: {
-        type: OptionType.SLIDER,
-        description: "A test for the 'slider' option type.",
-        minValue: 50,
-        maxValue: 250,
-        default: 50
-    }
-});
 
 export default definePlugin({
     name: "Lpdeck",
@@ -51,7 +10,6 @@ export default definePlugin({
     authors: [Devs.elia],
     required: false,
     startAt: StartAt.ApisLoaded,
-    settings,
     events: {
         onPlay: (_) => ws.sendPlayerData(),
         onPause: (_) => ws.sendPlayerData()

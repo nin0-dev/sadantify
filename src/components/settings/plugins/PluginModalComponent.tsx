@@ -1,5 +1,4 @@
-import { useSettings } from "@api/settings";
-import "./plugins.css";
+import "../extendifyPage.css";
 
 import { OptionType, Plugin } from "@utils/types";
 import {
@@ -21,7 +20,8 @@ import {
     SettingSelectComponent,
     SettingSliderComponent,
     SettingTextComponent
-} from "./components";
+} from "../components";
+import { useSettings } from "@api/settings";
 
 type Props = {
     isOpen?: boolean;

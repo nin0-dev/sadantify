@@ -1,20 +1,13 @@
-import "./plugins.css";
+import "./extendifyPage.css";
 
-import {
-    ButtonSecondary,
-    FilterProvider,
-    platform,
-    SearchBar,
-    Text
-} from "@webpack/common";
-import { plugins } from "plugins";
-import { useRef, React } from "@webpack/common";
-import PluginComponent from "./PluginComponent";
+import { platform, ButtonSecondary, Text } from "@webpack/common";
+import { React } from "@webpack/common";
+import PluginsSectionComponent from "./plugins/PluginsSectionComponent";
+import ThemesSectionComponent from "./themes/ThemesSectionComponent";
 
 export default () => {
-    const outerRef: React.RefObject<HTMLDivElement | null> = useRef(null);
     const [needRestart, _] = React.useState([] as string[]);
-    const [searchQuery, setSearchQuery] = React.useState("");
+    const [themeChanged, setThemeChanged] = React.useState(false);
 
     const onRestartNeeded = (plugin: string) => {
         needRestart.push(plugin);
@@ -22,28 +15,8 @@ export default () => {
 
     return (
         <>
-            <div className="ext-plugins-page-layout" ref={outerRef}>
-                <div className="ext-plugins-page-header">
-                    <Text
-                        as="h1"
-                        variant="titleMedium"
-                        semanticColor="textBase"
-                    >
-                        Plugins
-                    </Text>
-                    <div>
-                        <FilterProvider>
-                            <SearchBar
-                                placeholder="Search Plugins..."
-                                alwaysExpanded={false}
-                                debounceFilterChangeTimeout={0}
-                                onFilter={(v) => setSearchQuery(v)}
-                                clearOnEscapeInElementRef={outerRef}
-                            />
-                        </FilterProvider>
-                    </div>
-                </div>
-                {needRestart.length > 0 ? (
+            {(needRestart.length > 0 || themeChanged) && (
+                <div className="ext-plugins-page-layout">
                     <div className="ext-warning-container">
                         <Text
                             as="h1"
@@ -58,22 +31,25 @@ export default () => {
                                 variant="bodyMedium"
                                 semanticColor="textSubdued"
                             >
-                                The following plugins require you to restart
-                                Spotify for changes to take effect:
+                                {themeChanged
+                                    ? "A restart is required to apply the theme changes."
+                                    : "The following plugins require you to restart Spotify for changes to take effect:"}
                             </Text>
-                            <ol>
-                                {needRestart.map((v) => (
-                                    <li key={v}>
-                                        <Text
-                                            as="span"
-                                            variant="bodyMediumBold"
-                                            semanticColor="textBase"
-                                        >
-                                            •&nbsp;{v}
-                                        </Text>
-                                    </li>
-                                ))}
-                            </ol>
+                            {!themeChanged && (
+                                <ol>
+                                    {needRestart.map((v) => (
+                                        <li key={v}>
+                                            <Text
+                                                as="span"
+                                                variant="bodyMediumBold"
+                                                semanticColor="textBase"
+                                            >
+                                                •&nbsp;{v}
+                                            </Text>
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
                             <ButtonSecondary
                                 className="ext-warning-restart"
                                 onClick={(_: any) =>
@@ -89,64 +65,10 @@ export default () => {
                             </ButtonSecondary>
                         </div>
                     </div>
-                ) : (
-                    <></>
-                )}
-                <Text
-                    as="span"
-                    variant="bodyMediumBold"
-                    semanticColor="textSubdued"
-                >
-                    Plugins
-                </Text>
-                <div className="ext-plugins-grid">
-                    {Object.values(plugins)
-                        .filter(
-                            (v) =>
-                                searchQuery === "" ||
-                                v.name
-                                    .toLowerCase()
-                                    .includes(searchQuery.toLowerCase()) ||
-                                v.description
-                                    .toLowerCase()
-                                    .includes(searchQuery.toLowerCase())
-                        )
-                        .filter((v) => !v.required && !v.hidden)
-                        .map((v) => (
-                            <PluginComponent
-                                onRestartNeeded={onRestartNeeded}
-                                plugin={v}
-                            />
-                        ))}
                 </div>
-                <Text
-                    as="span"
-                    variant="bodyMediumBold"
-                    semanticColor="textSubdued"
-                >
-                    Required
-                </Text>
-                <div className="ext-plugins-grid">
-                    {Object.values(plugins)
-                        .filter(
-                            (v) =>
-                                searchQuery === "" ||
-                                v.name
-                                    .toLowerCase()
-                                    .includes(searchQuery.toLowerCase()) ||
-                                v.description
-                                    .toLowerCase()
-                                    .includes(searchQuery.toLowerCase())
-                        )
-                        .filter((v) => v.required && !v.hidden)
-                        .map((v) => (
-                            <PluginComponent
-                                onRestartNeeded={onRestartNeeded}
-                                plugin={v}
-                            />
-                        ))}
-                </div>
-            </div>
+            )}
+            <ThemesSectionComponent setThemeChanged={setThemeChanged} />
+            <PluginsSectionComponent onRestartNeeded={onRestartNeeded} />
         </>
     );
 };
