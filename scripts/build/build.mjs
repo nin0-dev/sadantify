@@ -18,7 +18,6 @@ import {
 } from "./common.mjs";
 import { minify as minifyHtml } from "html-minifier-terser";
 import { mkdir, readFile, writeFile } from "fs/promises";
-import { existsSync } from "fs";
 
 const defines = {
     IS_DEV,

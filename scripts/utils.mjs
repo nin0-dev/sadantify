@@ -3,6 +3,14 @@ import { constants } from "fs";
 import { join } from "path";
 import { execFileSync, execSync } from "child_process";
 
+export function hasArg(key) {
+    return Object.keys(process.env).includes(`npm_config_${key}`.toLowerCase());
+}
+
+export function getArg(key) {
+    return process.env[`npm_config_${key}`.toLowerCase()];
+}
+
 export async function exists(path) {
     return await access(path, constants.F_OK)
         .then(() => true)
@@ -10,11 +18,17 @@ export async function exists(path) {
 }
 
 export function getSpotifyPath() {
+    if (hasArg("spotifyPath")) {
+        return getArg("spotifyPath");
+    }
+
     switch (process.platform) {
         case "linux":
             return join(
                 process.env.HOME,
-                ".local/share/spotify-launcher/install/usr/share/spotify"
+                hasArg("flatpak")
+                    ? ".local/share/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify"
+                    : ".local/share/spotify-launcher/install/usr/share/spotify"
             );
         case "win32":
             return join(process.env.AppData, "Spotify");
@@ -24,9 +38,19 @@ export function getSpotifyPath() {
 }
 
 export function getCachePath() {
+    if (hasArg("cachePath")) {
+        console.log(getArg("cachePath"));
+        return getArg("cachePath");
+    }
+
     switch (process.platform) {
         case "linux":
-            return join(process.env.HOME, ".cache/spotify");
+            return join(
+                process.env.HOME,
+                hasArg("flatpak")
+                    ? ".var/app/com.spotify.Client/cache/spotify"
+                    : ".cache/spotify"
+            );
         case "win32":
             return join(process.env.LocalAppData, "Spotify");
         default:

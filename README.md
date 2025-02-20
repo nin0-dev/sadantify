@@ -14,9 +14,30 @@ I also took inspiration from [Spicetify](https://spicetify.app). I just thought 
 
 # Running
 
-Requires installing Spotify from the installer. (**NOT THE MICROSOFT STORE!**)
+If you're on Windows, Extendify requires installing Spotify from the installer. (**NOT THE MICROSOFT STORE!**)
 
-Currently the `applyPatch.mjs` script only supports Windows and Linux (tested on Arch + Hyprland).
+Currently the `applyPatch.mjs` script supports Windows and Linux (tested on Arch + Hyprland).
+
+## Scripts:
+
+- `npm run build`: Build Extendify.
+- `npm run dev`: Build, enable devtools and patch Spotify.
+- `npm run patch`: Patch Spotify.
+- `npm run unpatch`: Undo the patch.
+
+## Flags:
+
+- `--flatpak`: Use this flag when running on Linux with flatpak.
+- `--spotifyPath`: Use this flag to specify the path to Spotify's installation directory. (It should contain an `Apps` folder)
+- `--cachePath`: Use this flag to specify the path to the cache directory. (It should contain an `offline.bnk` file)
+
+Apply flags like this:
+
+```bash
+$ npm [flags] run <script>
+```
+
+---
 
 To build, enable devtools and patch Spotify, run:
 
@@ -28,6 +49,18 @@ To undo the patch, run:
 
 ```bash
 $ npm run unpatch
+```
+
+# Running (Linux + flatpak)
+
+```bash
+$ npm --flatpak run dev
+```
+
+To undo the patch, run:
+
+```bash
+$ npm --flatpak run unpatch
 ```
 
 # Screenshots

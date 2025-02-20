@@ -14,7 +14,7 @@ export default definePlugin({
         onPlay: (_) => ws.sendPlayerData(),
         onPause: (_) => ws.sendPlayerData()
     },
-    start() {
+    start: () => {
         ws.connect();
         setInterval(() => ws.sendPlayerData(), 500);
     },

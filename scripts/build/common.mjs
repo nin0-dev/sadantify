@@ -11,7 +11,7 @@ import { join } from "path";
 import { minify as minifyHtml } from "html-minifier-terser";
 import esbuild from "esbuild";
 import { builtinModules } from "module";
-import { exists } from "../utils.mjs";
+import { exists, hasArg } from "../utils.mjs";
 
 /** @type {import("../../package.json")} */
 const Package = JSON.parse(readFileSync("package.json"));
@@ -20,10 +20,12 @@ export const VERSION = Package.version;
 export const BUILD_TIMESTAMP =
     Number(process.env.SOURCE_DATE_EPOCH) || Date.now();
 
-export const watch = process.argv.includes("--watch");
-export const IS_DEV = watch || process.argv.includes("--dev");
-export const IS_REPORTER = process.argv.includes("--reporter");
-export const IS_STANDALONE = process.argv.includes("--standalone");
+export const watch = process.argv.includes("--watch") || hasArg("watch");
+export const IS_DEV = watch || process.argv.includes("--dev") || hasArg("dev");
+export const IS_REPORTER =
+    process.argv.includes("--reporter") || hasArg("reporter");
+export const IS_STANDALONE =
+    process.argv.includes("--standalone") || hasArg("standalone");
 
 const PluginDefinitionNameMatcher =
     /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
