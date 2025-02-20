@@ -72,7 +72,11 @@ export function killSpotify() {
 export function launchSpotify() {
     switch (process.platform) {
         case "linux":
-            return execSync("spotify-launcher");
+            return execSync(
+                hasArg("flatpak")
+                    ? "flatpak run com.spotify.Client"
+                    : "spotify-launcher"
+            );
         case "win32":
             return execFileSync(join(getSpotifyPath(), "Spotify.exe"));
         default:
