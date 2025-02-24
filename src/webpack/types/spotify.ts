@@ -1,6 +1,7 @@
 import { History } from "history";
 import { SettingsAPI } from "./settings";
 import { User } from "./user";
+import { AdManagers } from "./ads";
 
 export interface Platform {
     container: "Desktop";
@@ -8,7 +9,7 @@ export interface Platform {
     /**
      * The API that requests Spotify's advertising services.
      */
-    getAdManagers(): any;
+    getAdManagers(): AdManagers;
     /**
      * Allows you to retreive the user's audio output devices.
      */

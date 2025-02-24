@@ -9,12 +9,16 @@ export default definePlugin({
     required: true,
     startAt: StartAt.DOMContentLoaded,
     start: () => {
-        if (!Settings.theme) {
-            return;
+        if (Settings.theme.files.css) {
+            const style = document.createElement("style");
+            style.innerText = Settings.theme.files.css;
+            document.head.appendChild(style);
         }
 
-        const style = document.createElement("style");
-        style.innerText = Settings.theme.css;
-        document.head.appendChild(style);
+        if (Settings.theme.files.js) {
+            const script = document.createElement("script");
+            script.innerText = Settings.theme.files.js;
+            document.head.appendChild(script);
+        }
     }
 });

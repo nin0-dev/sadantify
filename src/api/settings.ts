@@ -26,13 +26,20 @@ export interface Settings {
             [setting: string]: any;
         };
     };
-    theme?: {
-        css: string;
+    theme: {
+        files: {
+            css?: string;
+            js?: string;
+        };
+        colors?: {};
     };
 }
 
 const DefaultSettings: Settings = {
-    plugins: {}
+    plugins: {},
+    theme: {
+        files: {}
+    }
 };
 
 const settings: Settings = !IS_REPORTER

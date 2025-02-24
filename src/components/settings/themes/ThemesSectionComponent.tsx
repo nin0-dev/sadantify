@@ -38,6 +38,8 @@ export default (props: {
     const settings = useSettings();
     const [fileUploadOpen, setFileUploadOpen] = React.useState(false);
 
+    const hasTheme = settings.theme.files.css || settings.theme.files.js;
+
     return (
         <div className="ext-plugins-page-layout">
             <div className="ext-plugins-page-header">
@@ -45,31 +47,30 @@ export default (props: {
                     Themes
                 </Text>
             </div>
-            <FileSelectComponent
-                isOpen={fileUploadOpen}
-                onChange={async (e) => {
-                    if (await checkCss(e.content)) {
-                        settings.theme = {
-                            css: e.content
-                        };
-                        console.log("write");
-                        props.setThemeChanged(true);
-                    }
-                    setFileUploadOpen(false);
-                }}
-                onCancel={() => setFileUploadOpen(false)}
-                onError={() => setFileUploadOpen(false)}
-            />
-            <ButtonSecondary onClick={() => setFileUploadOpen(true)}>
-                Upload Theme
-            </ButtonSecondary>
-            <ButtonSecondary disabled={!settings.theme}>
-                Edit Theme
-            </ButtonSecondary>
+            <div className="themes-upload-container">
+                <FileSelectComponent
+                    isOpen={fileUploadOpen}
+                    onChange={async (e) => {
+                        if (await checkCss(e.content)) {
+                            settings.theme.files.css = e.content;
+                            props.setThemeChanged(true);
+                        }
+                        setFileUploadOpen(false);
+                    }}
+                    onCancel={() => setFileUploadOpen(false)}
+                    onError={() => setFileUploadOpen(false)}
+                />
+                <ButtonSecondary onClick={() => setFileUploadOpen(true)}>
+                    Upload Theme
+                </ButtonSecondary>
+                <ButtonSecondary>Edit Colors</ButtonSecondary>
+            </div>
+            <ButtonSecondary disabled={!hasTheme}>Edit Theme</ButtonSecondary>
             <ButtonSecondary
-                disabled={!settings.theme}
+                disabled={!hasTheme}
                 onClick={() => {
-                    settings.theme = undefined;
+                    settings.theme.files.css = settings.theme.files.js =
+                        undefined;
                     props.setThemeChanged(true);
                 }}
             >
