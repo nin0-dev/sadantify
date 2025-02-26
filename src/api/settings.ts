@@ -16,6 +16,7 @@ import { SettingsStore as SettingsStoreClass } from "./settingsStore";
 import { CONFIG_KEY } from "@utils/constants";
 import { React, useEffect } from "@webpack/common";
 import plugins from "~plugins";
+import { FileSelectResult } from "components/FileSelectComponent";
 
 const logger = new Logger("Settings");
 
@@ -28,17 +29,18 @@ export interface Settings {
     };
     theme: {
         files: {
-            css?: string;
-            js?: string;
+            css?: FileSelectResult;
+            js?: FileSelectResult;
         };
-        colors?: {};
+        colors: {};
     };
 }
 
 const DefaultSettings: Settings = {
     plugins: {},
     theme: {
-        files: {}
+        files: {},
+        colors: {}
     }
 };
 

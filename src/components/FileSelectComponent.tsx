@@ -1,8 +1,10 @@
 import { React } from "@webpack/common";
 
+export type FileSelectResult = { fileName: string; content: string };
+
 type Props = {
     isOpen: boolean;
-    onChange: (e: { fileName: string; content: string }) => void;
+    onChange: (e: FileSelectResult) => void;
     onCancel?: () => void;
     onError?: (message: string) => void;
 };

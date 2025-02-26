@@ -9,14 +9,20 @@
 .ext-upload-theme-modal-option {
     display: flex;
     flex-direction: row;
+    justify-content: space-evenly;
     gap: 10px;
 }
 
 .ext-upload-theme-modal-option > svg {
-    height: 40px;
+    min-width: 40px;
+    width: 40px;
     margin: auto 0;
 }
 
-.ext-upload-theme-modal-option > button {
+.ext-upload-theme-modal-option-select {
     width: 100%;
+}
+
+.ext-upload-theme-modal-option-remove {
+    width: 170px;
 }
