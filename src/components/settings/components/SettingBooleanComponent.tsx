@@ -1,3 +1,5 @@
+import "./settingComponent.css";
+
 import { PluginOptionBoolean } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
 import { getToggleComponent, React, Text } from "@webpack/common";

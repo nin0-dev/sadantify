@@ -1,6 +1,8 @@
+import "./settingComponent.css";
+
 import { OptionType, PluginOptionNumber } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
-import { React, Text, TooltipWrapper } from "@webpack/common";
+import { React, Text } from "@webpack/common";
 import TextInputComponent from "components/TextInputComponent";
 
 const MAX_SAFE_NUMBER = BigInt(Number.MAX_SAFE_INTEGER);

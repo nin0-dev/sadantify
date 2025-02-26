@@ -1,4 +1,5 @@
-import "../extendifyPage.css";
+import "./plugins.css";
+import "../settingsSection.css";
 
 import {
     FilterProvider,
@@ -15,8 +16,8 @@ export default (props: { onRestartNeeded: (plugin: string) => void }) => {
     const [searchQuery, setSearchQuery] = React.useState("");
 
     return (
-        <div className="ext-plugins-page-layout" ref={outerRef}>
-            <div className="ext-plugins-page-header">
+        <div className="ext-settings-section-layout" ref={outerRef}>
+            <div className="ext-settings-section-header">
                 <Text as="h1" variant="titleMedium" semanticColor="textBase">
                     Plugins
                 </Text>

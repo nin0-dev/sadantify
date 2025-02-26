@@ -1,4 +1,4 @@
-import "../extendifyPage.css";
+import "./pluginModal.css";
 
 import { OptionType, Plugin } from "@utils/types";
 import {
@@ -26,8 +26,8 @@ import { useSettings } from "@api/settings";
 type Props = {
     isOpen?: boolean;
     plugin: Plugin;
-    onClose: () => void;
-    onRestartNeeded: () => void;
+    onClose?: () => void;
+    onRestartNeeded?: () => void;
 };
 
 const isObjectEmpty = (obj: object): boolean => {
@@ -67,7 +67,7 @@ export default (props: Props) => {
 
     const saveAndClose = async () => {
         if (!props.plugin.options) {
-            props.onClose();
+            props.onClose?.();
             return;
         }
 
@@ -92,15 +92,15 @@ export default (props: Props) => {
                 restartNeeded = true;
             }
         }
-        restartNeeded && props.onRestartNeeded();
+        restartNeeded && props.onRestartNeeded?.();
 
-        props.onClose();
+        props.onClose?.();
     };
 
     return (
         <ModalComponent
             isOpen={props.isOpen}
-            onClose={() => props.onClose()}
+            onClose={() => props.onClose?.()}
             animationMs={100}
             title={props.plugin.name}
         >
@@ -116,7 +116,7 @@ export default (props: Props) => {
             <Text as="span" variant="titleSmall" semanticColor="textBase">
                 Authors
             </Text>
-            <div className="ext-plugin-authors">
+            <div className="ext-plugin-modal-authors">
                 {props.plugin.authors.map((v) => (
                     <TooltipWrapper
                         label={`${v.name} (${v.github})`}
@@ -134,7 +134,7 @@ export default (props: Props) => {
             <Text as="span" variant="titleSmall" semanticColor="textBase">
                 Settings
             </Text>
-            <div className="ext-plugin-settings">
+            <div className="ext-plugin-modal-settings">
                 {hasSettings ? (
                     Object.entries(props.plugin.options!).map(
                         ([key, setting]) => {
@@ -182,7 +182,7 @@ export default (props: Props) => {
                 <ButtonPrimary onClick={() => saveAndClose()}>
                     Save & Close
                 </ButtonPrimary>
-                <ButtonSecondary onClick={() => props.onClose()}>
+                <ButtonSecondary onClick={() => props.onClose?.()}>
                     Cancel
                 </ButtonSecondary>
             </div>

@@ -1,4 +1,5 @@
-import "../extendifyPage.css";
+import "./themes.css";
+import "../settingsSection.css";
 
 import { useSettings } from "@api/settings";
 import { ButtonSecondary, React, Text } from "@webpack/common";
@@ -41,7 +42,7 @@ export default (props: {
     const hasTheme = settings.theme.files.css || settings.theme.files.js;
 
     return (
-        <div className="ext-plugins-page-layout">
+        <div className="ext-settings-section-layout">
             <div className="ext-plugins-page-header">
                 <Text as="h1" variant="titleMedium" semanticColor="textBase">
                     Themes

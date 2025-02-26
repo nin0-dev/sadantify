@@ -1,3 +1,5 @@
+import "./settingComponent.css";
+
 import { PluginOptionSelect } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
 import { React, Text } from "@webpack/common";

@@ -7,7 +7,7 @@
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
     color: var(--text-base);
     flex-direction: column;
-    min-height: 450px;
+    min-height: 100px;
     width: 550px;
     gap: 10px;
 }

@@ -1,4 +1,4 @@
-import "../extendifyPage.css";
+import "./plugins.css";
 
 import { Plugin } from "@utils/types";
 import {

@@ -1,3 +1,5 @@
+import "./settingComponent.css";
+
 import { PluginOptionSlider } from "@utils/types";
 import { ISettingElementProps, textToTitle } from ".";
 import { React, Slider, Text } from "@webpack/common";
