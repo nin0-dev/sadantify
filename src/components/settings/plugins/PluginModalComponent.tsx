@@ -9,7 +9,7 @@ import {
     Text,
     TooltipWrapper
 } from "@webpack/common";
-import { ModalComponent } from "components/ModalComponent";
+import { ModalComponent } from "components/modal/ModalComponent";
 import { ComponentType } from "react";
 import {
     ISettingCustomElementProps,
@@ -22,6 +22,7 @@ import {
     SettingTextComponent
 } from "../components";
 import { useSettings } from "@api/settings";
+import ModalFooterComponent from "components/modal/ModalFooterComponent";
 
 type Props = {
     isOpen?: boolean;
@@ -178,14 +179,10 @@ export default (props: Props) => {
                     </Text>
                 )}
             </div>
-            <div className="ext-plugin-modal-footer">
-                <ButtonPrimary onClick={() => saveAndClose()}>
-                    Save & Close
-                </ButtonPrimary>
-                <ButtonSecondary onClick={() => props.onClose?.()}>
-                    Cancel
-                </ButtonSecondary>
-            </div>
+            <ModalFooterComponent
+                onConfirm={() => saveAndClose()}
+                onCancel={() => props.onClose?.()}
+            />
         </ModalComponent>
     );
 };

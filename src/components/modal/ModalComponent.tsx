@@ -1,8 +1,8 @@
 import "./modal.css";
 
 import { ButtonTertiary, ModalWrapper, React, Text } from "@webpack/common";
-import { PropsWithChildren, ReactNode } from "react";
-import CloseIcon from "./icons/CloseIcon";
+import { PropsWithChildren } from "react";
+import CloseIcon from "../icons/CloseIcon";
 
 const createRandomString = (length: number): string => {
     let result = "";

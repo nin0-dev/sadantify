@@ -1,5 +1,4 @@
 .ext-plugin-modal-description {
-    border-top: 2px solid var(--text-base);
     padding-top: 10px;
     margin-bottom: 10px;
 }
@@ -23,12 +22,4 @@
     position: relative;
     bottom: 4px;
     width: 30px;
-}
-
-.ext-plugin-modal-footer {
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 10px;
-    padding-top: 10px;
-    margin-top: 10px;
 }

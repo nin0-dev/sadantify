@@ -1,0 +1,22 @@
+.ext-upload-theme-modal-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.ext-upload-theme-modal-option {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.ext-upload-theme-modal-option > svg {
+    height: 40px;
+    margin: auto 0;
+}
+
+.ext-upload-theme-modal-option > button {
+    width: 100%;
+}
