@@ -1,12 +1,8 @@
-import { QueueAction, QueueState } from "./queue";
-import { Identifiable, LoggingParams } from "./spotify";
+import { Identifiable, LoggingParams, QueueAction, QueueState } from "@webpack/types";
 
 export interface PlayerAPI {
     forcedShuffle: boolean;
-    addToQueue(
-        elements: { uid?: string; uri?: string }[],
-        loggingParams?: LoggingParams
-    ): Promise<void>;
+    addToQueue(elements: { uid?: string; uri?: string }[], loggingParams?: LoggingParams): Promise<void>;
     canPlayEncryptedContent(): Promise<boolean>;
     /**
      * Checks if {@param signal} is in {@link PlayerState.signals}.
@@ -118,11 +114,7 @@ export interface PlayerEvents {
     /**
      * @returns A callback that removes the listener when called.
      */
-    addListener(
-        event: PlayerEventType,
-        callback: (e: any) => void,
-        options?: any
-    ): () => void;
+    addListener(event: PlayerEventType, callback: (e: any) => void, options?: any): () => void;
 }
 
 export interface Song {

@@ -1,7 +1,9 @@
 import "./settingComponent.css";
 
+import { ISettingElementProps } from "@components/settings";
+
+import { textToTitle } from "@utils/text";
 import { PluginOptionSlider } from "@utils/types";
-import { ISettingElementProps, textToTitle } from ".";
 import { React, Slider, Text } from "@webpack/common";
 
 export default (props: ISettingElementProps<PluginOptionSlider>) => {
@@ -9,17 +11,11 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
         const storeValue = props.pluginSettings[props.id];
         if (storeValue) {
             if (storeValue > 1) {
-                return (
-                    (storeValue - props.setting.minValue) /
-                    props.setting.maxValue
-                );
+                return (storeValue - props.setting.minValue) / props.setting.maxValue;
             }
             return storeValue;
         } else if (props.setting.default) {
-            return (
-                (props.setting.default - props.setting.minValue) /
-                props.setting.maxValue
-            );
+            return (props.setting.default - props.setting.minValue) / props.setting.maxValue;
         }
         return 0;
     };
@@ -36,9 +32,7 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
     const onChange = (v: number) => {
         const realValue = getRealValue(v);
 
-        const isValid =
-            props.setting.isValid?.call(props.definedSettings, realValue) ??
-            true;
+        const isValid = props.setting.isValid?.call(props.definedSettings, realValue) ?? true;
         if (typeof isValid === "string") {
             setError(isValid);
         } else if (!isValid) {
@@ -54,18 +48,10 @@ export default (props: ISettingElementProps<PluginOptionSlider>) => {
     return (
         <div className="ext-plugin-setting-container">
             <div className="ext-plugin-setting-metadata">
-                <Text
-                    as="span"
-                    semanticColor="textBase"
-                    variant="bodyMediumBold"
-                >
+                <Text as="span" semanticColor="textBase" variant="bodyMediumBold">
                     {textToTitle(props.id)}
                 </Text>
-                <Text
-                    as="span"
-                    semanticColor="textSubdued"
-                    variant="bodyMedium"
-                >
+                <Text as="span" semanticColor="textSubdued" variant="bodyMedium">
                     {props.setting.description}
                 </Text>
             </div>

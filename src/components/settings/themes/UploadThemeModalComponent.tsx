@@ -1,15 +1,11 @@
 import "./uploadThemeModal.css";
 
+import { FileSelectComponent, FileSelectResult, ModalComponent, ModalFooterComponent } from "@components";
+import { CSSIcon, JavaScriptIcon } from "@components/icons";
+
 import { useSettings } from "@api/settings";
 import { Renderable } from "@utils/types";
 import { ButtonSecondary, React } from "@webpack/common";
-import FileSelectComponent, {
-    FileSelectResult
-} from "components/FileSelectComponent";
-import CSSIcon from "components/icons/CSSIcon";
-import JavaScriptIcon from "components/icons/JavaScriptIcon";
-import { ModalComponent } from "components/modal/ModalComponent";
-import ModalFooterComponent from "components/modal/ModalFooterComponent";
 
 type Props = {
     isOpen?: boolean;
@@ -21,6 +17,7 @@ type OptionProps = {
     label?: string;
     icon?: Renderable;
     selectedFile?: FileSelectResult;
+    check?: (content: string) => Promise<boolean>;
     onUpload?: (v: FileSelectResult) => void;
 };
 
@@ -28,21 +25,20 @@ const checkCss = (content: string): Promise<boolean> => {
     return new Promise((resolve) => {
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
-        iframe.style.width = iframe.style.height = "0";
         document.body.appendChild(iframe);
 
         const style = iframe.contentDocument?.createElement("style");
         if (!style || !iframe.contentDocument) {
             resolve(false);
+            iframe.remove();
             return;
         }
         style.onerror = () => {
             resolve(false);
+            iframe.remove();
         };
         style.onload = () => {
-            console.dir(style);
             if (style.sheet && style.sheet.cssRules.length > 0) {
-                console.log("RESOLVED");
                 resolve(true);
             }
             iframe.remove();
@@ -52,14 +48,14 @@ const checkCss = (content: string): Promise<boolean> => {
     });
 };
 
+// TODO: Implement checking if JS (and possibly TS) is valid
 const checkJs = (content: string): Promise<boolean> => {
     return Promise.resolve(true);
 };
 
 const Option = (props: OptionProps) => {
     const [fileUploadOpen, setFileUploadOpen] = React.useState(false);
-    const [selectedFile, setSelectedFile] =
-        React.useState<FileSelectResult | null>(props.selectedFile ?? null);
+    const [selectedFile, setSelectedFile] = React.useState<FileSelectResult | null>(props.selectedFile ?? null);
 
     const Icon = props.icon;
 
@@ -67,9 +63,11 @@ const Option = (props: OptionProps) => {
         <div className="ext-upload-theme-modal-option">
             <FileSelectComponent
                 isOpen={fileUploadOpen}
-                onChange={(v) => {
-                    props.onUpload?.(v);
-                    setSelectedFile(v);
+                onChange={async (v) => {
+                    if (!props.check || (await props.check(v.content))) {
+                        props.onUpload?.(v);
+                        setSelectedFile(v);
+                    }
                     setFileUploadOpen(false);
                 }}
                 onCancel={() => setFileUploadOpen(false)}
@@ -84,10 +82,7 @@ const Option = (props: OptionProps) => {
                 {selectedFile ? selectedFile.fileName : props.label}
             </ButtonSecondary>
             {selectedFile && (
-                <ButtonSecondary
-                    className="ext-upload-theme-modal-option-remove"
-                    onClick={() => setSelectedFile(null)}
-                >
+                <ButtonSecondary className="ext-upload-theme-modal-option-remove" onClick={() => setSelectedFile(null)}>
                     Remove
                 </ButtonSecondary>
             )}
@@ -97,49 +92,39 @@ const Option = (props: OptionProps) => {
 
 export default (props: Props) => {
     const settings = useSettings();
-    const [tempSettings, _] = React.useState<Record<string, any>>({
-        files: {}
-    });
+    const [tempSettings, _] = React.useState<Record<string, any>>({});
 
     return (
-        <>
-            <ModalComponent
-                isOpen={props.isOpen}
-                onClose={() => props.onClose?.()}
-                animationMs={100}
-                title="Upload Theme"
-            >
-                <div className="ext-upload-theme-modal-layout">
-                    <Option
-                        label="Upload CSS"
-                        icon={CSSIcon}
-                        selectedFile={settings.theme.files.css}
-                        onUpload={async (v) => {
-                            if (await checkCss(v.content)) {
-                                tempSettings.css = v;
-                            }
-                        }}
-                    />
-                    <Option
-                        label="Upload JS"
-                        icon={JavaScriptIcon}
-                        selectedFile={settings.theme.files.js}
-                        onUpload={async (v) => {
-                            if (await checkJs(v.content)) {
-                                tempSettings.js = v;
-                            }
-                        }}
-                    />
-                </div>
-                <ModalFooterComponent
-                    onConfirm={() => {
-                        settings.theme.files = tempSettings;
-                        props.setThemeChanged?.(true);
-                        props.onClose?.();
-                    }}
-                    onCancel={() => props.onClose?.()}
+        <ModalComponent isOpen={props.isOpen} onClose={() => props.onClose?.()} animationMs={100} title="Upload Theme">
+            <div className="ext-upload-theme-modal-layout">
+                <Option
+                    label="Upload CSS"
+                    icon={CSSIcon}
+                    selectedFile={settings.theme.files.css}
+                    check={checkCss}
+                    onUpload={(v) => (tempSettings.css = v)}
                 />
-            </ModalComponent>
-        </>
+                <Option
+                    label="Upload JS"
+                    icon={JavaScriptIcon}
+                    selectedFile={settings.theme.files.js}
+                    check={checkJs}
+                    onUpload={(v) => (tempSettings.js = v)}
+                />
+            </div>
+            <ModalFooterComponent
+                onConfirm={() => {
+                    for (const key in settings.theme.files) {
+                        if (settings.theme.files[key].content !== tempSettings[key]?.content) {
+                            settings.theme.files = tempSettings;
+                            props.setThemeChanged?.(true);
+                            break;
+                        }
+                    }
+                    props.onClose?.();
+                }}
+                onCancel={() => props.onClose?.()}
+            />
+        </ModalComponent>
     );
 };

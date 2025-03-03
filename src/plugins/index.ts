@@ -6,6 +6,7 @@ import { canonicalizeFind } from "@utils/patches";
 import { Patch, Plugin, ReporterTestable, StartAt } from "@utils/types";
 import { player } from "@webpack/common";
 import { PlayerEventType, PlayerState, Song } from "@webpack/types";
+
 import { traceFunction } from "debug/tracer";
 import { diffArrays } from "diff";
 import Plugins from "~plugins";
@@ -18,18 +19,10 @@ export const patches = [] as Patch[];
 const pluginsValues = Object.values(Plugins);
 
 export const isPluginEnabled = (p: string) => {
-    return (
-        (Plugins[p]?.required ||
-            Plugins[p]?.isDependency ||
-            Settings?.plugins[p]?.enabled) ??
-        false
-    );
+    return (Plugins[p]?.required || Plugins[p]?.isDependency || Settings?.plugins[p]?.enabled) ?? false;
 };
 
-export const addPatch = (
-    newPatch: Omit<Patch, "plugin">,
-    pluginName: string
-) => {
+export const addPatch = (newPatch: Omit<Patch, "plugin">, pluginName: string) => {
     const patch = newPatch as Patch;
     patch.plugin = pluginName;
 
@@ -53,17 +46,13 @@ export const addPatch = (
         });
     }
 
-    patch.replacement = patch.replacement.filter(
-        ({ predicate }) => !predicate || predicate()
-    );
+    patch.replacement = patch.replacement.filter(({ predicate }) => !predicate || predicate());
 
     patches.push(patch);
 };
 
 const isReporterTestable = (p: Plugin, part: ReporterTestable) => {
-    return p.reporterTestable === null
-        ? true
-        : (p.reporterTestable! & part) === part;
+    return p.reporterTestable === null ? true : (p.reporterTestable! & part) === part;
 };
 
 const neededApiPlugins = new Set<string>();
@@ -76,9 +65,7 @@ for (const p of pluginsValues)
         p.dependencies?.forEach((d) => {
             const dep = Plugins[d];
             if (!dep) {
-                const error = new Error(
-                    `Plugin ${p.name} has unresolved dependency ${d}`
-                );
+                const error = new Error(`Plugin ${p.name} has unresolved dependency ${d}`);
                 if (IS_DEV) {
                     throw error;
                 }
@@ -114,10 +101,7 @@ for (const p of pluginsValues) {
         for (const name in p.options) {
             const opt = p.options[name];
             if (opt.onChange !== null) {
-                SettingsStore.addChangeListener(
-                    `plugins.${p.name}.${name}`,
-                    opt.onChange!
-                );
+                SettingsStore.addChangeListener(`plugins.${p.name}.${name}`, opt.onChange!);
             }
         }
     }
@@ -131,29 +115,22 @@ for (const p of pluginsValues) {
     }
 }
 
-export const startAllPlugins = traceFunction(
-    "startAllPlugins",
-    (target: StartAt) => {
-        logger.info(`Starting plugins (stage ${target})`);
+export const startAllPlugins = traceFunction("startAllPlugins", (target: StartAt) => {
+    logger.info(`Starting plugins (stage ${target})`);
 
-        for (const name in Plugins) {
-            if (
-                isPluginEnabled(name) &&
-                (!IS_REPORTER ||
-                    isReporterTestable(Plugins[name], ReporterTestable.Start))
-            ) {
-                const p = Plugins[name];
+    for (const name in Plugins) {
+        if (isPluginEnabled(name) && (!IS_REPORTER || isReporterTestable(Plugins[name], ReporterTestable.Start))) {
+            const p = Plugins[name];
 
-                const startAt = p.startAt ?? StartAt.WebpackReady;
-                if (startAt !== target) {
-                    continue;
-                }
-
-                startPlugin(p);
+            const startAt = p.startAt ?? StartAt.WebpackReady;
+            if (startAt !== target) {
+                continue;
             }
+
+            startPlugin(p);
         }
     }
-);
+});
 
 const getPluginsForEvent = (event?: string): Plugin[] => {
     if (!event) {
@@ -178,71 +155,46 @@ let previousPlayerState: PlayerState = {} as PlayerState;
 let previousQueue: Song[] = [];
 
 export const createEventListeners = () => {
-    player
-        .getEvents()
-        .addListener(PlayerEventType.UPDATE, (e: { data: PlayerState }) => {
-            if (!previousPlayerState) {
-                previousPlayerState = e.data;
-                return;
-            }
-
-            if (e.data.isPaused !== previousPlayerState.isPaused) {
-                if (e.data.isPaused) {
-                    getPluginsForEvent("onPause").forEach((p) =>
-                        p.events?.onPause!(e.data)
-                    );
-                } else {
-                    getPluginsForEvent("onPlay").forEach((p) =>
-                        p.events?.onPlay!(e.data)
-                    );
-                }
-            }
-
-            if (
-                previousPlayerState.item &&
-                e.data.item?.uri !== previousPlayerState.item.uri
-            ) {
-                getPluginsForEvent("onSongChange").forEach((p) =>
-                    p.events?.onSongChange!(e.data.item!, e.data)
-                );
-            }
-
+    player.getEvents().addListener(PlayerEventType.UPDATE, (e: { data: PlayerState }) => {
+        if (!previousPlayerState) {
             previousPlayerState = e.data;
-        });
+            return;
+        }
 
-    player
-        .getEvents()
-        .addListener(PlayerEventType.QUEUE_ACTION_COMPLETE, (_) => {
-            if (previousQueue) {
-                const diff = diffArrays(
-                    previousQueue,
-                    player.getQueue().queued,
-                    {
-                        comparator: (left, right) => left.uri === right.uri
-                    }
-                );
-                for (const result of diff) {
-                    const event = result.added
-                        ? "onQueueAdded"
-                        : result.removed
-                          ? "onQueueRemoved"
-                          : undefined;
-                    if (!event) {
-                        continue;
-                    }
-                    getPluginsForEvent(event).forEach((p) =>
-                        p.events?.[event]!(result.value, player.getState())
-                    );
-                }
+        if (e.data.isPaused !== previousPlayerState.isPaused) {
+            if (e.data.isPaused) {
+                getPluginsForEvent("onPause").forEach((p) => p.events?.onPause!(e.data));
+            } else {
+                getPluginsForEvent("onPlay").forEach((p) => p.events?.onPlay!(e.data));
             }
+        }
 
-            previousQueue = player.getQueue().queued;
-        });
+        if (previousPlayerState.item && e.data.item?.uri !== previousPlayerState.item.uri) {
+            getPluginsForEvent("onSongChange").forEach((p) => p.events?.onSongChange!(e.data.item!, e.data));
+        }
+
+        previousPlayerState = e.data;
+    });
+
+    player.getEvents().addListener(PlayerEventType.QUEUE_ACTION_COMPLETE, (_) => {
+        if (previousQueue) {
+            const diff = diffArrays(previousQueue, player.getQueue().queued, {
+                comparator: (left, right) => left.uri === right.uri
+            });
+            for (const result of diff) {
+                const event = result.added ? "onQueueAdded" : result.removed ? "onQueueRemoved" : undefined;
+                if (!event) {
+                    continue;
+                }
+                getPluginsForEvent(event).forEach((p) => p.events?.[event]!(result.value, player.getState()));
+            }
+        }
+
+        previousQueue = player.getQueue().queued;
+    });
 };
 
-export const startDependenciesRecursive = (
-    p: Plugin
-): { restartNeeded: boolean; failures: string[] } => {
+export const startDependenciesRecursive = (p: Plugin): { restartNeeded: boolean; failures: string[] } => {
     let restartNeeded = false;
     const failures: string[] = [];
 
@@ -348,19 +300,13 @@ export const stopPlugin = traceFunction(
     (p) => `stopPlugin ${p.name}`
 );
 
-export const setPluginEnabled = (
-    plugin: Plugin,
-    value: boolean,
-    onRestartNeeded: (name: string) => void
-) => {
+export const setPluginEnabled = (plugin: Plugin, value: boolean, onRestartNeeded: (name: string) => void) => {
     const settings = Settings.plugins[plugin.name];
 
     if (value) {
         const { restartNeeded, failures } = startDependenciesRecursive(plugin);
         if (failures.length) {
-            logger.error(
-                `Failed to start dependencies for ${plugin.name}: ${failures.join(", ")}`
-            );
+            logger.error(`Failed to start dependencies for ${plugin.name}: ${failures.join(", ")}`);
             return;
         } else if (restartNeeded) {
             settings.enabled = true;
@@ -383,9 +329,7 @@ export const setPluginEnabled = (
     const result = !value ? stopPlugin(plugin) : startPlugin(plugin);
     if (!result) {
         settings.enabled = false;
-        logger.error(
-            `Error while ${!value ? "stopping" : "starting"} plugin ${plugin.name}`
-        );
+        logger.error(`Error while ${!value ? "stopping" : "starting"} plugin ${plugin.name}`);
         return;
     }
 

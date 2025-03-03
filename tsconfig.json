@@ -5,14 +5,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "allowJs": true,
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "esnext",
-            "esnext.array",
-            "esnext.asynciterable",
-            "esnext.symbol"
-        ],
+        "lib": ["DOM", "DOM.Iterable", "esnext", "esnext.array", "esnext.asynciterable", "esnext.symbol"],
         "module": "esnext",
         "moduleResolution": "node",
         "strict": true,
@@ -22,7 +15,15 @@
         "baseUrl": "./src/",
         "paths": {
             "@api/*": ["./api/*"],
+
+            "@components": ["./components"],
+            "@components/icons": ["./components/icons"],
+            "@components/settings": ["./components/settings"],
+            "@components/settings/plugins": ["./components/settings/plugins"],
+            "@components/settings/themes": ["./components/settings/themes"],
+
             "@utils/*": ["./utils/*"],
+
             "@webpack": ["./webpack/webpack"],
             "@webpack/common": ["./webpack/common"],
             "@webpack/types": ["./webpack/types"]

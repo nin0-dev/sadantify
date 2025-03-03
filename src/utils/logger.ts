@@ -2,7 +2,6 @@
  * Modified version of Vendicated's Logger.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/utils/Logger.ts
  */
-
 import { LOGGER_NAME } from "./constants";
 
 export class Logger {
@@ -15,12 +14,7 @@ export class Logger {
      * @example logger.errorCustomFmt(...Logger.makeTitleElements("white", "Hello"), "World");
      */
     static makeTitle(color: string, title: string): [string, ...string[]] {
-        return [
-            "%c %c %s ",
-            "",
-            `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
-            title
-        ];
+        return ["%c %c %s ", "", `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`, title];
     }
 
     constructor(
@@ -28,12 +22,7 @@ export class Logger {
         public color: string = "white"
     ) {}
 
-    private _log(
-        level: "log" | "error" | "warn" | "info" | "debug",
-        levelColor: string,
-        args: any[],
-        customFmt = ""
-    ) {
+    private _log(level: "log" | "error" | "warn" | "info" | "debug", levelColor: string, args: any[], customFmt = "") {
         console[level](
             `%c ${LOGGER_NAME} %c %c ${this.name} ${customFmt}`,
             `background: ${levelColor}; color: black; font-weight: bold; border-radius: 5px;`,

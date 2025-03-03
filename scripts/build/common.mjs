@@ -2,33 +2,28 @@
  * Modified version of Vendicated's common.mjs
  * @link https://github.com/Vendicated/Vencord/blob/main/scripts/build/common.mjs
  */
-
 import "../checkNodeVersion.js";
-
-import { readFileSync } from "fs";
-import { readdir, readFile } from "fs/promises";
-import { join } from "path";
-import { minify as minifyHtml } from "html-minifier-terser";
-import esbuild from "esbuild";
-import { builtinModules } from "module";
 import { exists, hasArg } from "../utils.mjs";
+
+import esbuild from "esbuild";
+import { readFileSync } from "fs";
+import { readFile, readdir } from "fs/promises";
+import { minify as minifyHtml } from "html-minifier-terser";
+import { builtinModules } from "module";
+import { join } from "path";
 
 /** @type {import("../../package.json")} */
 const Package = JSON.parse(readFileSync("package.json"));
 
 export const VERSION = Package.version;
-export const BUILD_TIMESTAMP =
-    Number(process.env.SOURCE_DATE_EPOCH) || Date.now();
+export const BUILD_TIMESTAMP = Number(process.env.SOURCE_DATE_EPOCH) || Date.now();
 
 export const watch = process.argv.includes("--watch") || hasArg("watch");
 export const IS_DEV = watch || process.argv.includes("--dev") || hasArg("dev");
-export const IS_REPORTER =
-    process.argv.includes("--reporter") || hasArg("reporter");
-export const IS_STANDALONE =
-    process.argv.includes("--standalone") || hasArg("standalone");
+export const IS_REPORTER = process.argv.includes("--reporter") || hasArg("reporter");
+export const IS_STANDALONE = process.argv.includes("--standalone") || hasArg("standalone");
 
-const PluginDefinitionNameMatcher =
-    /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
+const PluginDefinitionNameMatcher = /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
 /**
  * @param {string} base
  * @param {import("fs").Dirent} dirent
@@ -86,12 +81,7 @@ export const globPlugins = {
         });
 
         build.onLoad({ filter, namespace: "import-plugins" }, async () => {
-            const pluginDirs = [
-                "plugins",
-                "plugins/_core",
-                "plugins/_api",
-                "userplugins"
-            ];
+            const pluginDirs = ["plugins", "plugins/_core", "plugins/_api", "userplugins"];
 
             let code = "";
             let pluginsCode = "\n";
@@ -108,18 +98,11 @@ export const globPlugins = {
                 const files = await readdir(fullDir, { withFileTypes: true });
                 for (const file of files) {
                     const fileName = file.name;
-                    if (
-                        fileName.startsWith("_") ||
-                        fileName.startsWith(".") ||
-                        fileName === "index.ts"
-                    ) {
+                    if (fileName.startsWith("_") || fileName.startsWith(".") || fileName === "index.ts") {
                         continue;
                     }
 
-                    const folderName = `src/${dir}/${fileName}`.replace(
-                        /^src\/plugins\//,
-                        ""
-                    );
+                    const folderName = `src/${dir}/${fileName}`.replace(/^src\/plugins\//, "");
                     const mod = `p${i}`;
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
                     pluginsCode += `[${mod}.name]:${mod},\n`;
@@ -148,58 +131,47 @@ export const fileUrlPlugin = {
             path: args.path,
             pluginData: {
                 uri: args.path,
-                path: join(
-                    args.resolveDir,
-                    args.path.slice("file://".length).split("?")[0]
-                )
+                path: join(args.resolveDir, args.path.slice("file://".length).split("?")[0])
             }
         }));
 
-        build.onLoad(
-            { filter, namespace: "file-uri" },
-            async ({ pluginData: { path, uri } }) => {
-                const { searchParams } = new URIError(uri);
-                const base64 = searchParams.has("base64");
-                const minify = searchParams.has("minify");
-                const noTrim = searchParams.get("trim") === "false";
+        build.onLoad({ filter, namespace: "file-uri" }, async ({ pluginData: { path, uri } }) => {
+            const { searchParams } = new URIError(uri);
+            const base64 = searchParams.has("base64");
+            const minify = searchParams.has("minify");
+            const noTrim = searchParams.get("trim") === "false";
 
-                const encoding = base64 ? "base64" : "utf-8";
+            const encoding = base64 ? "base64" : "utf-8";
 
-                let content;
-                if (!minify) {
-                    content = await readFile(path, encoding);
-                    if (!noTrim) {
-                        content = content.trimEnd();
-                    }
+            let content;
+            if (!minify) {
+                content = await readFile(path, encoding);
+                if (!noTrim) {
+                    content = content.trimEnd();
+                }
+            } else {
+                if (path.endsWith(".html")) {
+                    content = await minifyHtml(await readFile(path, "utf-8"), commonMinifyOpts);
+                } else if (/[mc]?[jt]sx?$/.test(path)) {
+                    const res = await esbuild.build({
+                        entryPoints: [path],
+                        write: false,
+                        minify: true
+                    });
+                    content = res.outputFiles[0].text;
                 } else {
-                    if (path.endsWith(".html")) {
-                        content = await minifyHtml(
-                            await readFile(path, "utf-8"),
-                            commonMinifyOpts
-                        );
-                    } else if (/[mc]?[jt]sx?$/.test(path)) {
-                        const res = await esbuild.build({
-                            entryPoints: [path],
-                            write: false,
-                            minify: true
-                        });
-                        content = res.outputFiles[0].text;
-                    } else {
-                        throw new Error(
-                            `Don't know how to minify file type: ${path}`
-                        );
-                    }
-
-                    if (base64) {
-                        content = Buffer.from(content).toString("base64");
-                    }
+                    throw new Error(`Don't know how to minify file type: ${path}`);
                 }
 
-                return {
-                    contents: `export default ${JSON.stringify(content)}`
-                };
+                if (base64) {
+                    content = Buffer.from(content).toString("base64");
+                }
             }
-        );
+
+            return {
+                contents: `export default ${JSON.stringify(content)}`
+            };
+        });
     }
 };
 
@@ -215,9 +187,7 @@ export const banImportPlugin = (filter, message) => ({
     }
 });
 
-const escapedBuiltinModules = builtinModules
-    .map((m) => m.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"))
-    .join("|");
+const escapedBuiltinModules = builtinModules.map((m) => m.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")).join("|");
 const builtinModuleRegex = new RegExp(`^(node:)?(${escapedBuiltinModules})$`);
 
 /**
@@ -259,8 +229,5 @@ export const commonRendererPlugins = [
         builtinModuleRegex,
         "Cannot import node inbuilt modules in browser code. You need to use a native.ts file"
     ),
-    banImportPlugin(
-        /^react$/,
-        "Cannot import from react. React and hooks should imported from @webpack/common"
-    )
+    banImportPlugin(/^react$/, "Cannot import from react. React and hooks should imported from @webpack/common")
 ];

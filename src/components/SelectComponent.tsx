@@ -1,15 +1,15 @@
 import "./select.css";
 
-export type Option = {
+export type SelectOption = {
     value: any;
     label: string;
 };
 
 type Props = {
-    value?: Option;
-    options: Option[];
+    value?: SelectOption;
+    options: SelectOption[];
     id: string;
-    onSelect?: (option: Option) => void;
+    onSelect?: (option: SelectOption) => void;
 };
 
 export default (props: Props) => {
@@ -19,15 +19,10 @@ export default (props: Props) => {
                 <select
                     id={props.id}
                     className="ext-select-select"
-                    onChange={(e) =>
-                        props.onSelect?.(props.options[e.target.selectedIndex])
-                    }
+                    onChange={(e) => props.onSelect?.(props.options[e.target.selectedIndex])}
                 >
                     {props.options.map((v) => (
-                        <option
-                            selected={props.value && Object.is(v, props.value)}
-                            value={v.value}
-                        >
+                        <option selected={props.value && Object.is(v, props.value)} value={v.value}>
                             {v.label}
                         </option>
                     ))}

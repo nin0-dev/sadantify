@@ -1,6 +1,6 @@
 import { Settings } from "@api/settings";
 import { Devs } from "@utils/constants";
-import { definePlugin, StartAt } from "@utils/types";
+import { StartAt, definePlugin } from "@utils/types";
 
 export default definePlugin({
     name: "Themes",
@@ -11,13 +11,13 @@ export default definePlugin({
     start: () => {
         if (Settings.theme.files.css) {
             const style = document.createElement("style");
-            style.innerText = Settings.theme.files.css;
+            style.innerText = Settings.theme.files.css.content;
             document.head.appendChild(style);
         }
 
         if (Settings.theme.files.js) {
             const script = document.createElement("script");
-            script.innerText = Settings.theme.files.js;
+            script.innerText = Settings.theme.files.js.content;
             document.head.appendChild(script);
         }
     }

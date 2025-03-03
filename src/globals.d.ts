@@ -1,4 +1,5 @@
 import { WebpackInstance } from "@webpack/types";
+
 import type JSZip from "jszip";
 
 declare global {

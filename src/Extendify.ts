@@ -1,15 +1,16 @@
-export * as Api from "./api";
-export * as Plugins from "./plugins";
-export * as Util from "./utils";
-export * as Webpack from "./webpack";
+import { Logger } from "@utils/logger";
+import { StartAt } from "@utils/types";
+import { _resolveReady, onceReady, waitFor } from "@webpack";
 
 import "./webpack/patcher";
 
 import { runReporter } from "debug/reporter";
-import { _resolveReady, onceReady, waitFor } from "@webpack";
-import { StartAt } from "@utils/types";
 import { patches, startAllPlugins } from "plugins";
-import { Logger } from "@utils/logger";
+
+export * as Api from "./api";
+export * as Plugins from "./plugins";
+export * as Util from "./utils";
+export * as Webpack from "./webpack";
 
 if (IS_REPORTER) {
     runReporter();
@@ -22,9 +23,7 @@ async function init() {
     startAllPlugins(StartAt.WebpackReady);
 
     if (IS_DEV) {
-        const pendingPatches = patches.filter(
-            (p) => !p.all && p.predicate?.() !== false
-        );
+        const pendingPatches = patches.filter((p) => !p.all && p.predicate?.() !== false);
         if (pendingPatches.length) {
             new Logger("PluginManager", "#a6d189").warn(
                 "Webpack has finished initializing, but some patches haven't been applied yet.",

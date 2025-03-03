@@ -1,6 +1,7 @@
+import { getCachePath } from "./utils.mjs";
+
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
-import { getCachePath } from "./utils.mjs";
 
 const bnkPath = join(getCachePath(), "offline.bnk");
 
@@ -10,11 +11,9 @@ const enableDevtools = async () => {
     const length = "app-developer".length;
 
     const firstLocation = content.indexOf("app-developer");
-    const firstPatchLocation =
-        firstLocation !== -1 ? firstLocation + length + 1 : -1;
+    const firstPatchLocation = firstLocation !== -1 ? firstLocation + length + 1 : -1;
     const secondLocation = content.lastIndexOf("app-developer");
-    const secondPatchLocation =
-        secondLocation !== -1 ? secondLocation + length + 2 : -1;
+    const secondPatchLocation = secondLocation !== -1 ? secondLocation + length + 2 : -1;
 
     const buffer = Buffer.from(content, "binary");
     if (firstPatchLocation !== -1) {

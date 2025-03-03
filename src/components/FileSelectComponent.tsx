@@ -19,27 +19,25 @@ export default (props: Props) => {
     }, [ref, props.isOpen]);
 
     return (
-        <>
-            <input
-                ref={ref}
-                className="wcftliF4QjZKB1CYgEON"
-                type="file"
-                onChange={(e) => {
-                    if (!e.target.files || e.target.files.length === 0) {
-                        return props.onCancel?.();
-                    }
+        <input
+            ref={ref}
+            className="wcftliF4QjZKB1CYgEON"
+            type="file"
+            onChange={(e) => {
+                if (!e.target.files || e.target.files.length === 0) {
+                    return props.onCancel?.();
+                }
 
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        props.onChange({
-                            fileName: e.target.files![0].name,
-                            content: reader.result?.toString() ?? ""
-                        });
-                    };
-                    reader.onerror = () => props.onCancel?.();
-                    reader.readAsText(e.target.files[0]);
-                }}
-            />
-        </>
+                const reader = new FileReader();
+                reader.onload = () => {
+                    props.onChange({
+                        fileName: e.target.files![0].name,
+                        content: reader.result?.toString() ?? ""
+                    });
+                };
+                reader.onerror = () => props.onCancel?.();
+                reader.readAsText(e.target.files[0]);
+            }}
+        />
     );
 };

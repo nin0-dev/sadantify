@@ -1,13 +1,13 @@
 import "./settingComponent.css";
 
+import { ISettingElementProps } from "@components/settings";
+
+import { textToTitle } from "@utils/text";
 import { PluginOptionBoolean } from "@utils/types";
-import { ISettingElementProps, textToTitle } from ".";
-import { getToggleComponent, React, Text } from "@webpack/common";
+import { React, Text, getToggleComponent } from "@webpack/common";
 
 export default (props: ISettingElementProps<PluginOptionBoolean>) => {
-    const [state, setState] = React.useState(
-        props.pluginSettings[props.id] ?? props.setting.default ?? false
-    );
+    const [state, setState] = React.useState(props.pluginSettings[props.id] ?? props.setting.default ?? false);
     const [error, setError] = React.useState<string | null>(null);
 
     React.useEffect(() => props.onError(error !== null), [error]);
@@ -15,8 +15,7 @@ export default (props: ISettingElementProps<PluginOptionBoolean>) => {
     const Toggle = getToggleComponent();
 
     const onChange = (v: boolean) => {
-        const isValid =
-            props.setting.isValid?.call(props.definedSettings, v) ?? true;
+        const isValid = props.setting.isValid?.call(props.definedSettings, v) ?? true;
         if (typeof isValid === "string") {
             setError(isValid);
         } else if (!isValid) {
@@ -32,27 +31,17 @@ export default (props: ISettingElementProps<PluginOptionBoolean>) => {
     return (
         <div className="ext-plugin-setting-container">
             <div className="ext-plugin-setting-metadata">
-                <Text
-                    as="span"
-                    semanticColor="textBase"
-                    variant="bodyMediumBold"
-                >
+                <Text as="span" semanticColor="textBase" variant="bodyMediumBold">
                     {textToTitle(props.id)}
                 </Text>
-                <Text
-                    as="span"
-                    semanticColor="textSubdued"
-                    variant="bodyMedium"
-                >
+                <Text as="span" semanticColor="textSubdued" variant="bodyMedium">
                     {props.setting.description}
                 </Text>
             </div>
             <Toggle
                 id={props.id}
                 onSelected={(v) => onChange(v)}
-                disabled={
-                    props.setting.disabled?.call(props.definedSettings) ?? false
-                }
+                disabled={props.setting.disabled?.call(props.definedSettings) ?? false}
                 value={state}
             />
             {error && (

@@ -1,15 +1,11 @@
-import "./plugins.css";
 import "../settingsSection.css";
+import "./plugins.css";
 
-import {
-    FilterProvider,
-    React,
-    SearchBar,
-    Text,
-    useRef
-} from "@webpack/common";
+import { PluginComponent } from "@components/settings/plugins";
+
+import { FilterProvider, React, SearchBar, Text, useRef } from "@webpack/common";
+
 import { plugins } from "plugins";
-import PluginComponent from "./PluginComponent";
 
 export default (props: { onRestartNeeded: (plugin: string) => void }) => {
     const outerRef: React.RefObject<HTMLDivElement | null> = useRef(null);
@@ -33,11 +29,7 @@ export default (props: { onRestartNeeded: (plugin: string) => void }) => {
                     </FilterProvider>
                 </div>
             </div>
-            <Text
-                as="span"
-                variant="bodyMediumBold"
-                semanticColor="textSubdued"
-            >
+            <Text as="span" variant="bodyMediumBold" semanticColor="textSubdued">
                 Plugins
             </Text>
             <div className="ext-plugins-grid">
@@ -45,26 +37,15 @@ export default (props: { onRestartNeeded: (plugin: string) => void }) => {
                     .filter(
                         (v) =>
                             searchQuery === "" ||
-                            v.name
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase()) ||
-                            v.description
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase())
+                            v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            v.description.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .filter((v) => !v.required && !v.hidden)
                     .map((v) => (
-                        <PluginComponent
-                            onRestartNeeded={props.onRestartNeeded}
-                            plugin={v}
-                        />
+                        <PluginComponent onRestartNeeded={props.onRestartNeeded} plugin={v} />
                     ))}
             </div>
-            <Text
-                as="span"
-                variant="bodyMediumBold"
-                semanticColor="textSubdued"
-            >
+            <Text as="span" variant="bodyMediumBold" semanticColor="textSubdued">
                 Required
             </Text>
             <div className="ext-plugins-grid">
@@ -72,19 +53,12 @@ export default (props: { onRestartNeeded: (plugin: string) => void }) => {
                     .filter(
                         (v) =>
                             searchQuery === "" ||
-                            v.name
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase()) ||
-                            v.description
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase())
+                            v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            v.description.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .filter((v) => v.required && !v.hidden)
                     .map((v) => (
-                        <PluginComponent
-                            onRestartNeeded={props.onRestartNeeded}
-                            plugin={v}
-                        />
+                        <PluginComponent onRestartNeeded={props.onRestartNeeded} plugin={v} />
                     ))}
             </div>
         </div>

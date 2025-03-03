@@ -1,6 +1,7 @@
+import { getSpotifyPath, wrapSpotifyProcess } from "../utils.mjs";
+
 import { readdir, rename, rm } from "fs/promises";
 import { join } from "path";
-import { getSpotifyPath, wrapSpotifyProcess } from "../utils.mjs";
 
 const appsPath = join(getSpotifyPath(), "Apps");
 

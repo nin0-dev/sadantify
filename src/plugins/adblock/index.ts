@@ -1,5 +1,5 @@
 import { Devs } from "@utils/constants";
-import { definePlugin, StartAt } from "@utils/types";
+import { StartAt, definePlugin } from "@utils/types";
 import { platform } from "@webpack/common";
 
 export default definePlugin({

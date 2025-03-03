@@ -18,10 +18,7 @@ export default (props: Props) => {
         <div className="ext-text-input-container">
             {props.label && (
                 <label htmlFor={props.id} className="ext-text-input-label">
-                    <Text
-                        variant="marginalBold"
-                        className="ext-text-input-label-content"
-                    >
+                    <Text variant="marginalBold" className="ext-text-input-label-content">
                         {props.label}
                     </Text>
                 </label>

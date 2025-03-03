@@ -1,5 +1,6 @@
 import { Devs } from "@utils/constants";
-import { definePlugin, StartAt } from "@utils/types";
+import { StartAt, definePlugin } from "@utils/types";
+
 import { ReconnectableWebSocket } from "./ws";
 
 const ws = new ReconnectableWebSocket();

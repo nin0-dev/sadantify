@@ -1,6 +1,6 @@
 import { Devs } from "@utils/constants";
 import { isPlayingLocally } from "@utils/spotify";
-import { definePlugin, StartAt } from "@utils/types";
+import { StartAt, definePlugin } from "@utils/types";
 import { player } from "@webpack/common";
 
 export default definePlugin({

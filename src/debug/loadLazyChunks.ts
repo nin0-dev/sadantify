@@ -2,11 +2,9 @@
  * Modified version of Vendicated's loadLazyChunks.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/debug/loadLazyChunks.ts
  */
-
 import { Logger } from "@utils/logger";
 import { canonicalizeMatch } from "@utils/patches";
-import * as Webpack from "@webpack";
-import { wreq } from "@webpack";
+import { ChunkIdsRegex, factoryListeners, wreq } from "@webpack";
 
 const logger = new Logger("LazyChunkLoader");
 
@@ -19,9 +17,7 @@ export const loadLazyChunks = async () => {
         const deferredRequires = new Set<number>();
 
         let chunksSearchingResolve: (value: void | PromiseLike<void>) => void;
-        const chunksSearchingDone = new Promise<void>(
-            (r) => (chunksSearchingResolve = r)
-        );
+        const chunksSearchingDone = new Promise<void>((r) => (chunksSearchingResolve = r));
 
         // True if resolved, false otherwise
         const chunksSearchPromises = [] as Array<() => boolean>;
@@ -32,66 +28,50 @@ export const loadLazyChunks = async () => {
 
         async function searchAndLoadLazyChunks(factoryCode: string) {
             const lazyChunks = factoryCode.matchAll(LazyChunkRegex);
-            const validChunkGroups = new Set<
-                [chunkIds: number[], entryPoint: number]
-            >();
+            const validChunkGroups = new Set<[chunkIds: number[], entryPoint: number]>();
 
             const shouldForceDefer = false;
 
             await Promise.all(
-                Array.from(lazyChunks).map(
-                    async ([, rawChunkIds, entryPoint]) => {
-                        const chunkIds = rawChunkIds
-                            ? Array.from(
-                                  rawChunkIds.matchAll(Webpack.ChunkIdsRegex)
-                              ).map((m) => Number(m[1]))
-                            : [];
+                Array.from(lazyChunks).map(async ([, rawChunkIds, entryPoint]) => {
+                    const chunkIds = rawChunkIds
+                        ? Array.from(rawChunkIds.matchAll(ChunkIdsRegex)).map((m) => Number(m[1]))
+                        : [];
 
-                        if (chunkIds.length === 0) {
-                            return;
-                        }
-
-                        let invalidChunkGroup = false;
-
-                        for (const id of chunkIds) {
-                            if (
-                                wreq.u(id) === null ||
-                                wreq.u(id) === "undefined.js"
-                            ) {
-                                continue;
-                            }
-
-                            const isWorkerAsset = await fetch(
-                                wreq.p + wreq.u(id)
-                            )
-                                .then((r) => r.text())
-                                .then((t) => t.includes("importScripts("));
-
-                            if (isWorkerAsset) {
-                                invalidChunks.add(id);
-                                invalidChunkGroup = true;
-                                continue;
-                            }
-
-                            validChunks.add(id);
-                        }
-
-                        if (!invalidChunkGroup) {
-                            validChunkGroups.add([
-                                chunkIds,
-                                Number(entryPoint)
-                            ]);
-                        }
+                    if (chunkIds.length === 0) {
+                        return;
                     }
-                )
+
+                    let invalidChunkGroup = false;
+
+                    for (const id of chunkIds) {
+                        if (wreq.u(id) === null || wreq.u(id) === "undefined.js") {
+                            continue;
+                        }
+
+                        const isWorkerAsset = await fetch(wreq.p + wreq.u(id))
+                            .then((r) => r.text())
+                            .then((t) => t.includes("importScripts("));
+
+                        if (isWorkerAsset) {
+                            invalidChunks.add(id);
+                            invalidChunkGroup = true;
+                            continue;
+                        }
+
+                        validChunks.add(id);
+                    }
+
+                    if (!invalidChunkGroup) {
+                        validChunkGroups.add([chunkIds, Number(entryPoint)]);
+                    }
+                })
             );
 
             // Loads all found valid chunk groups
             await Promise.all(
                 Array.from(validChunkGroups).map(([chunkIds]) =>
-                    Promise.all(
-                        chunkIds.map((id) => wreq.e(id as any).catch(() => {}))
-                    )
+                    Promise.all(chunkIds.map((id) => wreq.e(id as any).catch(() => {})))
                 )
             );
 
@@ -135,20 +115,16 @@ export const loadLazyChunks = async () => {
             }, 0);
         }
 
-        Webpack.factoryListeners.add((factory) => {
+        factoryListeners.add((factory) => {
             let isResolved = false;
-            searchAndLoadLazyChunks(factory.toString()).then(
-                () => (isResolved = true)
-            );
+            searchAndLoadLazyChunks(factory.toString()).then(() => (isResolved = true));
 
             chunksSearchPromises.push(() => isResolved);
         });
 
         for (const factoryId in wreq.m) {
             let isResolved = false;
-            searchAndLoadLazyChunks(wreq.m[factoryId].toString()).then(
-                () => (isResolved = true)
-            );
+            searchAndLoadLazyChunks(wreq.m[factoryId].toString()).then(() => (isResolved = true));
 
             chunksSearchPromises.push(() => isResolved);
         }
@@ -163,9 +139,7 @@ export const loadLazyChunks = async () => {
         const allChunks = [] as number[];
 
         // Matches "id" or id:
-        for (const currentMatch of wreq!.u
-            .toString()
-            .matchAll(/(?:"([\deE]+?)"(?![,}]))|(?:([\deE]+?):)/g)) {
+        for (const currentMatch of wreq!.u.toString().matchAll(/(?:"([\deE]+?)"(?![,}]))|(?:([\deE]+?):)/g)) {
             const id = currentMatch[1] ?? currentMatch[2];
             if (id === null) {
                 continue;

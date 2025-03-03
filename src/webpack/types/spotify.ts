@@ -1,7 +1,6 @@
+import { AdManagers, SettingsAPI, User } from "@webpack/types";
+
 import { History } from "history";
-import { SettingsAPI } from "./settings";
-import { User } from "./user";
-import { AdManagers } from "./ads";
 
 export interface Platform {
     container: "Desktop";

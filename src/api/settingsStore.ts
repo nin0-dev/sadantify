@@ -2,7 +2,6 @@
  * Copy of Vendicated's SettingsStore.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/shared/SettingsStore.ts
  */
-
 import { LiteralUnion } from "type-fest";
 
 export const SYM_IS_PROXY = Symbol("SettingsStore.isProxy");
@@ -19,12 +18,7 @@ type ResolvePropDeep<T, P> = P extends `${infer Pre}.${infer Suf}`
 
 interface SettingsStoreOptions {
     readOnly?: boolean;
-    getDefaultValue?: (data: {
-        target: any;
-        key: string;
-        root: any;
-        path: string;
-    }) => any;
+    getDefaultValue?: (data: { target: any; key: string; root: any; path: string }) => any;
 }
 
 // merges the SettingsStoreOptions type into the class
@@ -158,15 +152,10 @@ export class SettingsStore<T extends object> {
         if (paths.length > 2 && paths[0] === "plugins") {
             const settingPath = paths.slice(0, 3);
             const settingPathStr = settingPath.join(".");
-            const settingValue = settingPath.reduce(
-                (acc, curr) => acc[curr],
-                root
-            );
+            const settingValue = settingPath.reduce((acc, curr) => acc[curr], root);
 
             this.globalListeners.forEach((cb) => cb(root, settingPathStr));
-            this.pathListeners
-                .get(settingPathStr)
-                ?.forEach((cb) => cb && cb(settingValue));
+            this.pathListeners.get(settingPathStr)?.forEach((cb) => cb && cb(settingValue));
         } else {
             this.globalListeners.forEach((cb) => cb(root, pathStr));
         }
@@ -255,10 +244,7 @@ export class SettingsStore<T extends object> {
      * Remove a scoped listener
      * @see {@link addChangeListener}
      */
-    public removeChangeListener(
-        path: LiteralUnion<keyof T, string>,
-        cb: (data: any) => void
-    ) {
+    public removeChangeListener(path: LiteralUnion<keyof T, string>, cb: (data: any) => void) {
         const listeners = this.pathListeners.get(path as string);
         if (!listeners) return;
 

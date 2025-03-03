@@ -1,4 +1,4 @@
-import { Song } from "./player";
+import { Song } from "@webpack/types";
 
 export interface QueueState {
     current: Song;

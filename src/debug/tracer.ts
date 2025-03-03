@@ -2,7 +2,6 @@
  * Modified version of Vendicated's Tracer.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/debug/Tracer.ts
  */
-
 import { Logger } from "@utils/logger";
 
 if (IS_DEV || IS_REPORTER) {
@@ -33,19 +32,11 @@ export const finishTrace = !(IS_DEV || IS_REPORTER)
 type Func = (...args: any[]) => any;
 type TraceNameMapper<F extends Func> = (...args: Parameters<F>) => string;
 
-const noopTracer = <F extends Func>(
-    name: string,
-    f: Func,
-    mapper?: TraceNameMapper<F>
-) => f;
+const noopTracer = <F extends Func>(name: string, f: Func, mapper?: TraceNameMapper<F>) => f;
 
 export const traceFunction = !(IS_DEV || IS_REPORTER)
     ? noopTracer
-    : <F extends Func>(
-          name: string,
-          f: Func,
-          mapper?: TraceNameMapper<F>
-      ): F => {
+    : <F extends Func>(name: string, f: Func, mapper?: TraceNameMapper<F>): F => {
           return function (this: any, ...args: Parameters<F>) {
               const traceName = mapper?.(...args) ?? name;
               beginTrace(traceName, ...arguments);

@@ -1,6 +1,6 @@
 import "./restartWarning.css";
 
-import { ButtonSecondary, platform, Text } from "@webpack/common";
+import { ButtonSecondary, Text, platform } from "@webpack/common";
 
 type Props = {
     themeChanged?: boolean;
@@ -14,11 +14,7 @@ export default (props: Props) => {
                 Restart Required
             </Text>
             <div className="ext-warning-content">
-                <Text
-                    as="span"
-                    variant="bodyMedium"
-                    semanticColor="textSubdued"
-                >
+                <Text as="span" variant="bodyMedium" semanticColor="textSubdued">
                     {props.themeChanged
                         ? "A restart is required to apply the theme changes."
                         : "The following plugins require you to restart Spotify for changes to take effect:"}
@@ -27,11 +23,7 @@ export default (props: Props) => {
                     <ol>
                         {props.needRestart?.map((v) => (
                             <li key={v}>
-                                <Text
-                                    as="span"
-                                    variant="bodyMediumBold"
-                                    semanticColor="textBase"
-                                >
+                                <Text as="span" variant="bodyMediumBold" semanticColor="textBase">
                                     •&nbsp;{v}
                                 </Text>
                             </li>

@@ -12,17 +12,9 @@ interface ISettingElementPropsBase<T> {
     onError: (e: boolean) => void;
 }
 
-export type ISettingElementProps<T extends PluginOptionBase> =
+export type ISettingElementProps<T extends PluginOptionBase> = ISettingElementPropsBase<T>;
+export type ISettingCustomElementProps<T extends Omit<PluginOptionBase, "description" | "placeholder">> =
     ISettingElementPropsBase<T>;
-export type ISettingCustomElementProps<
-    T extends Omit<PluginOptionBase, "description" | "placeholder">
-> = ISettingElementPropsBase<T>;
-
-export const textToTitle = (text: string) =>
-    text
-        .split(/(?=[A-Z])/)
-        .map((w) => w[0].toUpperCase() + w.slice(1).toLowerCase())
-        .join(" ");
 
 export { default as SettingBooleanComponent } from "./SettingBooleanComponent";
 export { default as SettingCustomComponent } from "./SettingCustomComponent";

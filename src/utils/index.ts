@@ -5,4 +5,5 @@ export * from "./lazyReact";
 export * from "./logger";
 export * from "./patches";
 export * from "./spotify";
+export * from "./text";
 export * from "./types";

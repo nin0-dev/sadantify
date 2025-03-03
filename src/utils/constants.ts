@@ -4,7 +4,7 @@ export const WEBPACK_CHUNK = "webpackChunkclient_web";
 export const LOGGER_NAME = "Extendify";
 export const CONFIG_KEY = "extendify-opts";
 
-export const Devs = /* #__PURE__*/ Object.freeze({
+export const Devs = Object.freeze({
     elia: {
         name: "Elia",
         github: "7elia"

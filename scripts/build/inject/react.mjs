@@ -9,6 +9,5 @@ export let ExtendifyCreateElement = (...args) => {
         setTimeout(() => ExtendifyCreateElement(...args), 100);
         return;
     }
-    return (ExtendifyCreateElement =
-        Extendify.Webpack.Common.React.createElement)(...args);
+    return (ExtendifyCreateElement = Extendify.Webpack.Common.React.createElement)(...args);
 };

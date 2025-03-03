@@ -32,11 +32,7 @@ export const makeLazy = <T>(factory: () => T, attempts = 5): (() => T) => {
  * Note that the example below exists already as an api, see {@link findByPropsLazy}
  * @example const mod = proxyLazy(() => findByProps("blah")); console.log(mod.blah);
  */
-export const proxyLazy = <T>(
-    factory: () => T,
-    attempts = 5,
-    isChild = false
-): T => {
+export const proxyLazy = <T>(factory: () => T, attempts = 5, isChild = false): T => {
     let isSameTick = true;
     if (!isChild) {
         setTimeout(() => (isSameTick = false), 0);
@@ -68,18 +64,11 @@ export const proxyLazy = <T>(
             // meow here will also be a lazy
             // `const { meow } = findByPropsLazy("meow");`
             if (!isChild && isSameTick) {
-                return proxyLazy(
-                    () => Reflect.get(target[SYM_LAZY_GET](), p, receiver),
-                    attempts,
-                    true
-                );
+                return proxyLazy(() => Reflect.get(target[SYM_LAZY_GET](), p, receiver), attempts, true);
             }
 
             const lazyTarget = target[SYM_LAZY_GET]();
-            if (
-                typeof lazyTarget === "object" ||
-                typeof lazyTarget === "function"
-            ) {
+            if (typeof lazyTarget === "object" || typeof lazyTarget === "function") {
                 return Reflect.get(lazyTarget, p, receiver);
             }
             throw new Error("'proxyLazy' called on a primitive value");

@@ -2,16 +2,14 @@
  * Modified version of Vendicated's types.ts
  * https://github.com/Vendicated/Vencord/blob/main/src/utils/types.ts
  */
-
 import { PlayerState } from "@webpack/types";
-import { Promisable } from "type-fest";
 import { Song } from "@webpack/types";
+
+import { Promisable } from "type-fest";
 
 export type Renderable = () => React.ReactNode | React.JSX.Element | null;
 
-export const definePlugin = <P extends PluginDef>(
-    p: P & Record<string, any>
-) => {
+export const definePlugin = <P extends PluginDef>(p: P & Record<string, any>) => {
     return p;
 };
 
@@ -148,8 +146,7 @@ export type SettingsDefinition = Record<string, PluginSettingDef>;
 export type SettingsChecks<D extends SettingsDefinition> = {
     [K in keyof D]?: D[K] extends PluginSettingComponentDef
         ? IsDisabled<DefinedSettings<D>>
-        : IsDisabled<DefinedSettings<D>> &
-              IsValid<PluginSettingType<D[K]>, DefinedSettings<D>>;
+        : IsDisabled<DefinedSettings<D>> & IsValid<PluginSettingType<D[K]>, DefinedSettings<D>>;
 };
 
 export type PluginSettingDef =
@@ -266,35 +263,33 @@ export interface PluginSettingComponentDef {
 }
 
 /** Maps a `PluginSettingDef` to its value type */
-type PluginSettingType<O extends PluginSettingDef> =
-    O extends PluginSettingStringDef
-        ? string
-        : O extends PluginSettingNumberDef
-          ? number
-          : O extends PluginSettingBigIntDef
-            ? BigInt
-            : O extends PluginSettingBooleanDef
-              ? boolean
-              : O extends PluginSettingSelectDef
-                ? O["options"][number]["value"]
-                : O extends PluginSettingSliderDef
-                  ? number
-                  : O extends PluginSettingComponentDef
-                    ? any
-                    : O extends PluginSettingCustomDef
-                      ? O extends { default: infer Default }
-                          ? Default
-                          : any
-                      : never;
-
-type PluginSettingDefaultType<O extends PluginSettingDef> =
-    O extends PluginSettingSelectDef
-        ? O["options"] extends { default?: boolean }[]
+type PluginSettingType<O extends PluginSettingDef> = O extends PluginSettingStringDef
+    ? string
+    : O extends PluginSettingNumberDef
+      ? number
+      : O extends PluginSettingBigIntDef
+        ? BigInt
+        : O extends PluginSettingBooleanDef
+          ? boolean
+          : O extends PluginSettingSelectDef
             ? O["options"][number]["value"]
-            : undefined
-        : O extends { default: infer T }
-          ? T
-          : undefined;
+            : O extends PluginSettingSliderDef
+              ? number
+              : O extends PluginSettingComponentDef
+                ? any
+                : O extends PluginSettingCustomDef
+                  ? O extends { default: infer Default }
+                      ? Default
+                      : any
+                  : never;
+
+type PluginSettingDefaultType<O extends PluginSettingDef> = O extends PluginSettingSelectDef
+    ? O["options"] extends { default?: boolean }[]
+        ? O["options"][number]["value"]
+        : undefined
+    : O extends { default: infer T }
+      ? T
+      : undefined;
 
 type SettingsStore<D extends SettingsDefinition> = {
     [K in keyof D]: PluginSettingType<D[K]> | PluginSettingDefaultType<D[K]>;
@@ -330,12 +325,9 @@ export interface DefinedSettings<
     withPrivateSettings<T extends object>(): DefinedSettings<Def, Checks, T>;
 }
 
-export type PartialExcept<T, R extends keyof T> = Partial<T> &
-    Required<Pick<T, R>>;
+export type PartialExcept<T, R extends keyof T> = Partial<T> & Required<Pick<T, R>>;
 
-export type IpcRes<V = any> =
-    | { ok: true; value: V }
-    | { ok: false; error: any };
+export type IpcRes<V = any> = { ok: true; value: V } | { ok: false; error: any };
 
 /* -------------------------------------------- */
 /*             Legacy Options Types             */
@@ -350,30 +342,16 @@ export type PluginOptionsItem =
     | PluginOptionSlider
     | PluginOptionComponent
     | PluginOptionCustom;
-export type PluginOptionString = PluginSettingStringDef &
-    PluginSettingCommon &
-    IsDisabled &
-    IsValid<string>;
-export type PluginOptionNumber = (
-    | PluginSettingNumberDef
-    | PluginSettingBigIntDef
-) &
+export type PluginOptionString = PluginSettingStringDef & PluginSettingCommon & IsDisabled & IsValid<string>;
+export type PluginOptionNumber = (PluginSettingNumberDef | PluginSettingBigIntDef) &
     PluginSettingCommon &
     IsDisabled &
     IsValid<number | BigInt>;
-export type PluginOptionBoolean = PluginSettingBooleanDef &
-    PluginSettingCommon &
-    IsDisabled &
-    IsValid<boolean>;
+export type PluginOptionBoolean = PluginSettingBooleanDef & PluginSettingCommon & IsDisabled & IsValid<boolean>;
 export type PluginOptionSelect = PluginSettingSelectDef &
     PluginSettingCommon &
     IsDisabled &
     IsValid<PluginSettingSelectOption>;
-export type PluginOptionSlider = PluginSettingSliderDef &
-    PluginSettingCommon &
-    IsDisabled &
-    IsValid<number>;
-export type PluginOptionComponent = PluginSettingComponentDef &
-    PluginSettingCommon;
-export type PluginOptionCustom = PluginSettingCustomDef &
-    Pick<PluginSettingCommon, "onChange">;
+export type PluginOptionSlider = PluginSettingSliderDef & PluginSettingCommon & IsDisabled & IsValid<number>;
+export type PluginOptionComponent = PluginSettingComponentDef & PluginSettingCommon;
+export type PluginOptionCustom = PluginSettingCustomDef & Pick<PluginSettingCommon, "onChange">;

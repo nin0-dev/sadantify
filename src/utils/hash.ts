@@ -5,13 +5,9 @@
  * @link https://github.com/discord/discord-intl/blob/main/packages/intl/src/hash.ts
  * @license MIT
  */
-
 import { hash as h64 } from "@intrnl/xxhash64";
 
-const BASE64_TABLE =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split(
-        ""
-    );
+const BASE64_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
 const IS_BIG_ENDIAN = (() => {
     const array = new Uint8Array(4);
     const view = new Uint32Array(array.buffer);

@@ -9,6 +9,5 @@ export const _injectTopbarElements = (children: React.ReactNode[]) => {
     return children;
 };
 
-export const addTopbarElement = (id: string, renderable: Renderable) =>
-    topbarElements.set(id, renderable);
+export const addTopbarElement = (id: string, renderable: Renderable) => topbarElements.set(id, renderable);
 export const removeTopbarElement = (id: string) => topbarElements.delete(id);

@@ -1,9 +1,10 @@
 import "./settingsSection.css";
 
+import { RestartWarningComponent } from "@components/settings";
+import { PluginsSectionComponent } from "@components/settings/plugins";
+import { ThemesSectionComponent } from "@components/settings/themes";
+
 import { React } from "@webpack/common";
-import PluginsSectionComponent from "./plugins/PluginsSectionComponent";
-import ThemesSectionComponent from "./themes/ThemesSectionComponent";
-import RestartWarningComponent from "./RestartWarningComponent";
 
 export default () => {
     const [needRestart, _] = React.useState([] as string[]);
@@ -17,10 +18,7 @@ export default () => {
         <>
             {(needRestart.length > 0 || themeChanged) && (
                 <div className="ext-settings-section-layout">
-                    <RestartWarningComponent
-                        needRestart={needRestart}
-                        themeChanged={themeChanged}
-                    />
+                    <RestartWarningComponent needRestart={needRestart} themeChanged={themeChanged} />
                 </div>
             )}
             <ThemesSectionComponent setThemeChanged={setThemeChanged} />

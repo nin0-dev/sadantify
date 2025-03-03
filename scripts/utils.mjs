@@ -1,7 +1,7 @@
-import { access } from "fs/promises";
-import { constants } from "fs";
-import { join } from "path";
 import { execFileSync, execSync } from "child_process";
+import { constants } from "fs";
+import { access } from "fs/promises";
+import { join } from "path";
 
 export function hasArg(key) {
     return Object.keys(process.env).includes(`npm_config_${key}`.toLowerCase());
@@ -47,9 +47,7 @@ export function getCachePath() {
         case "linux":
             return join(
                 process.env.HOME,
-                hasArg("flatpak")
-                    ? ".var/app/com.spotify.Client/cache/spotify"
-                    : ".cache/spotify"
+                hasArg("flatpak") ? ".var/app/com.spotify.Client/cache/spotify" : ".cache/spotify"
             );
         case "win32":
             return join(process.env.LocalAppData, "Spotify");
@@ -72,11 +70,7 @@ export function killSpotify() {
 export function launchSpotify() {
     switch (process.platform) {
         case "linux":
-            return execSync(
-                hasArg("flatpak")
-                    ? "flatpak run com.spotify.Client"
-                    : "spotify-launcher"
-            );
+            return execSync(hasArg("flatpak") ? "flatpak run com.spotify.Client" : "spotify-launcher");
         case "win32":
             return execFileSync(join(getSpotifyPath(), "Spotify.exe"));
         default:

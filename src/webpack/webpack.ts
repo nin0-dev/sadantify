@@ -2,13 +2,13 @@
  * Modified version of Vendicated's webpack.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/webpack/webpack.ts
  */
-
-import { canonicalizeMatch } from "@utils/patches";
-import { WebpackInstance } from "./types";
-import { Logger } from "@utils/logger";
-import { traceFunction } from "debug/tracer";
 import { makeLazy, proxyLazy } from "@utils/lazy";
 import { LazyComponent } from "@utils/lazyReact";
+import { Logger } from "@utils/logger";
+import { canonicalizeMatch } from "@utils/patches";
+import { WebpackInstance } from "@webpack/types";
+
+import { traceFunction } from "debug/tracer";
 
 const logger = new Logger("Webpack");
 
@@ -24,17 +24,13 @@ export type CodeFilter = Array<string | RegExp>;
 
 export const stringMatches = (s: string, filter: CodeFilter) => {
     return filter.every((f) => {
-        return typeof f === "string"
-            ? s.includes(f)
-            : (f.global && (f.lastIndex = 0), f.test(s));
+        return typeof f === "string" ? s.includes(f) : (f.global && (f.lastIndex = 0), f.test(s));
     });
 };
 
 export const filters = {
     byProps: (...props: PropsFilter): FilterFn => {
-        return props.length === 1
-            ? (m) => m[props[0]] !== void 0
-            : (m) => props.every((p) => m[p] !== void 0);
+        return props.length === 1 ? (m) => m[props[0]] !== void 0 : (m) => props.every((p) => m[p] !== void 0);
     },
     byCode: (...code: CodeFilter): FilterFn => {
         const parsedCode = code.map(canonicalizeMatch);
@@ -42,10 +38,7 @@ export const filters = {
             if (typeof m !== "function") {
                 return false;
             }
-            return stringMatches(
-                Function.prototype.toString.call(m),
-                parsedCode
-            );
+            return stringMatches(Function.prototype.toString.call(m), parsedCode);
         };
         filter.$$extendifyProps = [...code];
         return filter;
@@ -58,9 +51,7 @@ export const filters = {
             } else if (!m.$$typeof) {
                 return false;
             } else if (m.type) {
-                return m.type.render
-                    ? filter(m.type.render) /* memo + forwardRef */
-                    : filter(m.type); /* memo */
+                return m.type.render ? filter(m.type.render) /* memo + forwardRef */ : filter(m.type); /* memo */
             } else if (m.render) {
                 return filter(m.render); /* forwardRef */
             }
@@ -68,9 +59,7 @@ export const filters = {
         };
     },
     componentByName: (name: string): FilterFn => {
-        const codeFilter = filters.componentByCode(
-            new RegExp(String.raw`"data-encore-id":.\..\.${name}`)
-        );
+        const codeFilter = filters.componentByCode(new RegExp(String.raw`"data-encore-id":.\..\.${name}`));
         return (m) => {
             if (m.render && m.$$typeof) {
                 if (m.displayName === name || codeFilter(m)) {
@@ -87,9 +76,7 @@ export type CallbackFn = (mod: any, id: string) => void;
 export const subscriptions = new Map<FilterFn, CallbackFn>();
 export const moduleListeners = new Set<CallbackFn>();
 export const factoryListeners = new Set<
-    (
-        factory: (module: any, exports: any, require: WebpackInstance) => void
-    ) => void
+    (factory: (module: any, exports: any, require: WebpackInstance) => void) => void
 >();
 export const beforeInitListeners = new Set<(wreq: WebpackInstance) => void>();
 
@@ -113,21 +100,14 @@ export const find = traceFunction(
     "find",
     (
         filter: FilterFn,
-        {
-            isIndirect = false,
-            isWaitFor = false
-        }: { isIndirect?: boolean; isWaitFor?: boolean } = {}
+        { isIndirect = false, isWaitFor = false }: { isIndirect?: boolean; isWaitFor?: boolean } = {}
     ) => {
         if (typeof filter !== "function") {
-            throw new Error(
-                "Invalid filter. Expected function got " + typeof filter
-            );
+            throw new Error("Invalid filter. Expected function got " + typeof filter);
         }
 
         if (cache) {
-            logger.debug(
-                `${Object.keys(cache).length} modules available in Webpack cache`
-            );
+            logger.debug(`${Object.keys(cache).length} modules available in Webpack cache`);
         }
 
         for (const key in cache) {
@@ -168,9 +148,7 @@ export const find = traceFunction(
 
 export const findAll = (filter: FilterFn) => {
     if (typeof filter !== "function") {
-        throw new Error(
-            "Invalid filter. Expected function got " + typeof filter
-        );
+        throw new Error("Invalid filter. Expected function got " + typeof filter);
     }
 
     const ret = [] as any[];
@@ -207,9 +185,7 @@ export const findAll = (filter: FilterFn) => {
  */
 export const findBulk = traceFunction("findBulk", (filterFns: FilterFn[]) => {
     if (!Array.isArray(filterFns)) {
-        throw new Error(
-            "Invalid filters. Expected function[] got " + typeof filterFns
-        );
+        throw new Error("Invalid filters. Expected function[] got " + typeof filterFns);
     }
 
     const { length } = filterFns;
@@ -218,9 +194,7 @@ export const findBulk = traceFunction("findBulk", (filterFns: FilterFn[]) => {
         throw new Error("Expected at least two filters.");
     } else if (length === 1) {
         if (IS_DEV) {
-            logger.warn(
-                "'findBulk' called with only one filter. Use 'find' instead."
-            );
+            logger.warn("'findBulk' called with only one filter. Use 'find' instead.");
         }
         return find(filterFns[0]);
     }
@@ -280,9 +254,7 @@ export const findBulk = traceFunction("findBulk", (filterFns: FilterFn[]) => {
     }
 
     if (found !== length) {
-        const err = new Error(
-            `Got ${length} filters, but only found ${found} modules!`
-        );
+        const err = new Error(`Got ${length} filters, but only found ${found} modules!`);
         if (IS_DEV) {
             throw err;
         } else {
@@ -297,29 +269,24 @@ export const findBulk = traceFunction("findBulk", (filterFns: FilterFn[]) => {
  * Find the id of the first module factory that includes all the given code
  * @returns string or null
  */
-export const findModuleId = traceFunction(
-    "findModuleId",
-    (...code: CodeFilter) => {
-        code = code.map(canonicalizeMatch);
+export const findModuleId = traceFunction("findModuleId", (...code: CodeFilter) => {
+    code = code.map(canonicalizeMatch);
 
-        for (const id in wreq.m) {
-            if (stringMatches(wreq.m[id].toString(), code)) {
-                return;
-            }
+    for (const id in wreq.m) {
+        if (stringMatches(wreq.m[id].toString(), code)) {
+            return;
         }
-
-        const err = new Error(
-            "Didn't find module with code(s):\n" + code.join("\n")
-        );
-        if (IS_DEV) {
-            throw err;
-        } else {
-            logger.warn(err);
-        }
-
-        return null;
     }
-);
+
+    const err = new Error("Didn't find module with code(s):\n" + code.join("\n"));
+    if (IS_DEV) {
+        throw err;
+    } else {
+        logger.warn(err);
+    }
+
+    return null;
+});
 
 /**
  * Find the first module factory that includes all the given code
@@ -365,10 +332,7 @@ export const lazyWebpackSearchHistory = [] as Array<
  * Note that the example below exists already as an api, see {@link findByPropsLazy}
  * @example const mod = proxyLazy(() => findByProps("blah")); console.log(mod.blah);
  */
-export const proxyLazyWebpack = <T = any>(
-    factory: () => T,
-    attempts?: number
-) => {
+export const proxyLazyWebpack = <T = any>(factory: () => T, attempts?: number) => {
     if (IS_REPORTER) {
         lazyWebpackSearchHistory.push(["proxyLazyWebpack", [factory]]);
     }
@@ -383,10 +347,7 @@ export const proxyLazyWebpack = <T = any>(
  * @param attempts How many times to try to get the component before giving up
  * @returns Result of factory function
  */
-export const LazyComponentWebpack = <T extends object = any>(
-    factory: () => any,
-    attempts?: number
-) => {
+export const LazyComponentWebpack = <T extends object = any>(factory: () => any, attempts?: number) => {
     if (IS_REPORTER) {
         lazyWebpackSearchHistory.push(["LazyComponentWebpack", [factory]]);
     }
@@ -469,29 +430,21 @@ export const findComponentLazy = <T extends object = any>(filter: FilterFn) => {
 /**
  * Finds the first component that includes all the given code, lazily
  */
-export const findComponentByCodeLazy = <T extends object = any>(
-    ...code: CodeFilter
-) => {
+export const findComponentByCodeLazy = <T extends object = any>(...code: CodeFilter) => {
     if (IS_REPORTER) {
         lazyWebpackSearchHistory.push(["findComponentByCode", code]);
     }
-    return LazyComponent<T>(() =>
-        find(filters.componentByCode(...code), { isIndirect: true })
-    );
+    return LazyComponent<T>(() => find(filters.componentByCode(...code), { isIndirect: true }));
 };
 
 /**
  * Finds the first component that is exported by the first prop name, lazily
  */
-export const findExportedComponentLazy = <T extends object = any>(
-    ...props: PropsFilter
-) => {
+export const findExportedComponentLazy = <T extends object = any>(...props: PropsFilter) => {
     if (IS_REPORTER) {
         lazyWebpackSearchHistory.push(["findExportedComponent", props]);
     }
-    return LazyComponent<T>(
-        () => find(filters.byProps(...props), { isIndirect: true })[props[0]]
-    );
+    return LazyComponent<T>(() => find(filters.byProps(...props), { isIndirect: true })[props[0]]);
 };
 
 /**
@@ -509,10 +462,7 @@ export const findExportedComponentLazy = <T extends object = any>(
  */
 export const mapMangledModule = traceFunction(
     "mapMangledModule",
-    <S extends string>(
-        code: string | RegExp | CodeFilter,
-        mappers: Record<S, FilterFn>
-    ): Record<S, any> => {
+    <S extends string>(code: string | RegExp | CodeFilter, mappers: Record<S, FilterFn>): Record<S, any> => {
         const exports = {} as Record<S, any>;
 
         const id = findModuleId(...(Array.isArray(code) ? code : [code]));
@@ -571,15 +521,10 @@ export const ChunkIdsRegex = /\("([^"]+?)"\)/g;
  * @param matcher A RegExp that returns the chunk ids array as the first capture group and the entry point id as the second. Defaults to a matcher that captures the first lazy chunk loading found in the module factory
  * @returns A promise that resolves with a boolean whether the chunks were loaded
  */
-export const extractAndLoadChunks = async (
-    code: CodeFilter,
-    matcher: RegExp = DefaultExtractAndLoadChunksRegex
-) => {
+export const extractAndLoadChunks = async (code: CodeFilter, matcher: RegExp = DefaultExtractAndLoadChunksRegex) => {
     const module = findModuleFactory(...code);
     if (!module) {
-        const err = new Error(
-            "extractAndLoadChunks: Couldn't find module factory"
-        );
+        const err = new Error("extractAndLoadChunks: Couldn't find module factory");
         logger.warn(err, "Code:", code, "Matcher:", matcher);
 
         if (IS_DEV) {
@@ -591,9 +536,7 @@ export const extractAndLoadChunks = async (
 
     const match = module.toString().match(canonicalizeMatch(matcher));
     if (!match) {
-        const err = new Error(
-            "extractAndLoadChunks: Couldn't find chunk loading in module factory code"
-        );
+        const err = new Error("extractAndLoadChunks: Couldn't find chunk loading in module factory code");
         logger.warn(err, "Code:", code, "Matcher:", matcher);
 
         if (IS_DEV) {
@@ -618,9 +561,7 @@ export const extractAndLoadChunks = async (
     }
 
     if (rawChunkIds) {
-        const chunkIds = Array.from(rawChunkIds.matchAll(ChunkIdsRegex)).map(
-            (m: any) => Number(m[1])
-        );
+        const chunkIds = Array.from(rawChunkIds.matchAll(ChunkIdsRegex)).map((m: any) => Number(m[1]));
         await Promise.all(chunkIds.map((id) => wreq.e(id)));
     }
 
@@ -649,15 +590,9 @@ export const extractAndLoadChunks = async (
  * @param matcher A RegExp that returns the chunk ids array as the first capture group and the entry point id as the second. Defaults to a matcher that captures the first lazy chunk loading found in the module factory
  * @returns A function that returns a promise that resolves with a boolean whether the chunks were loaded, on first call
  */
-export const extractAndLoadChunksLazy = (
-    code: CodeFilter,
-    matcher = DefaultExtractAndLoadChunksRegex
-) => {
+export const extractAndLoadChunksLazy = (code: CodeFilter, matcher = DefaultExtractAndLoadChunksRegex) => {
     if (IS_REPORTER) {
-        lazyWebpackSearchHistory.push([
-            "extractAndLoadChunks",
-            [code, matcher]
-        ]);
+        lazyWebpackSearchHistory.push(["extractAndLoadChunks", [code, matcher]]);
     }
     return makeLazy(() => extractAndLoadChunks(code, matcher));
 };
@@ -672,10 +607,7 @@ export const waitFor = (
     { isIndirect = false }: { isIndirect?: boolean } = {}
 ) => {
     if (IS_REPORTER && !isIndirect) {
-        lazyWebpackSearchHistory.push([
-            "waitFor",
-            Array.isArray(filter) ? filter : [filter]
-        ]);
+        lazyWebpackSearchHistory.push(["waitFor", Array.isArray(filter) ? filter : [filter]]);
     }
 
     if (typeof filter === "string") {
@@ -683,9 +615,7 @@ export const waitFor = (
     } else if (Array.isArray(filter)) {
         filter = filters.byProps(...filter);
     } else if (typeof filter !== "function") {
-        throw new Error(
-            "Filter must be string, string[] or function, got " + typeof filter
-        );
+        throw new Error("Filter must be string, string[] or function, got " + typeof filter);
     }
 
     if (cache !== null) {
@@ -701,18 +631,12 @@ export const waitFor = (
     subscriptions.set(filter, callback);
 };
 
-export const waitForComponent = <
-    T extends React.ComponentType<any> = React.ComponentType<any> &
-        Record<string, any>
->(
+export const waitForComponent = <T extends React.ComponentType<any> = React.ComponentType<any> & Record<string, any>>(
     name: string,
     filter: FilterFn | string | string[]
 ): T => {
     if (IS_REPORTER) {
-        lazyWebpackSearchHistory.push([
-            "waitForComponent",
-            Array.isArray(filter) ? filter : [filter]
-        ]);
+        lazyWebpackSearchHistory.push(["waitForComponent", Array.isArray(filter) ? filter : [filter]]);
     }
 
     let value: T = function () {

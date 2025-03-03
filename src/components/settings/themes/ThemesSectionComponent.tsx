@@ -1,13 +1,12 @@
-import "./themes.css";
 import "../settingsSection.css";
+import "./themes.css";
+
+import { EditColorsModalComponent, UploadThemeModalComponent } from "@components/settings/themes";
 
 import { useSettings } from "@api/settings";
 import { ButtonSecondary, React, Text } from "@webpack/common";
-import UploadThemeModalComponent from "./UploadThemeModalComponent";
 
-export default (props: {
-    setThemeChanged: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+export default (props: { setThemeChanged: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const settings = useSettings();
 
     const [uploadModalOpen, setUploadModalOpen] = React.useState(false);
@@ -28,27 +27,23 @@ export default (props: {
                     onClose={() => setUploadModalOpen(false)}
                     setThemeChanged={props.setThemeChanged}
                 />
-                <ButtonSecondary onClick={() => setUploadModalOpen(true)}>
-                    Upload Theme
-                </ButtonSecondary>
-                <ButtonSecondary onClick={() => setColorModalOpen(true)}>
-                    Edit Colors
-                </ButtonSecondary>
+                <ButtonSecondary onClick={() => setUploadModalOpen(true)}>Upload Theme</ButtonSecondary>
+                <EditColorsModalComponent
+                    isOpen={colorModalOpen}
+                    onClose={() => setColorModalOpen(false)}
+                    setThemeChanged={props.setThemeChanged}
+                />
+                <ButtonSecondary onClick={() => setColorModalOpen(true)}>Edit Colors</ButtonSecondary>
             </div>
             <ButtonSecondary disabled={!hasTheme}>Edit Theme</ButtonSecondary>
             <ButtonSecondary
                 disabled={!hasTheme}
                 onClick={() => {
-                    settings.theme.files.css = settings.theme.files.js =
-                        undefined;
+                    settings.theme.files.css = settings.theme.files.js = undefined;
                     props.setThemeChanged(true);
                 }}
             >
-                <Text
-                    as="span"
-                    variant="bodyMediumBold"
-                    semanticColor="textNegative"
-                >
+                <Text as="span" variant="bodyMediumBold" semanticColor="textNegative">
                     Remove Theme
                 </Text>
             </ButtonSecondary>

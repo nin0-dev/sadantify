@@ -1,11 +1,7 @@
 import { proxyLazy } from "@utils/lazy";
 import { StartAt } from "@utils/types";
-import {
-    ConnectDevicesAPI,
-    Platform,
-    PlaybackAPI,
-    PlayerAPI
-} from "@webpack/types";
+import { ConnectDevicesAPI, Platform, PlaybackAPI, PlayerAPI } from "@webpack/types";
+
 import { createEventListeners, startAllPlugins } from "plugins";
 
 const findApiLazy = <T>(name: string): T => {

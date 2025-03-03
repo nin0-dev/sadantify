@@ -18,6 +18,7 @@
         "jszip": "^3.10.1"
     },
     "devDependencies": {
+        "@trivago/prettier-plugin-sort-imports": "^5.2.2",
         "@types/diff": "^7.0.0",
         "@types/history": "^4.7.11",
         "@types/html-minifier-terser": "^7.0.2",

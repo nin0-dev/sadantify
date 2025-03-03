@@ -21,16 +21,8 @@ export interface WebpackInstance {
      */
     m: {
         [id: number]: {
-            (
-                e: { exports: any; id: number; loaded: boolean },
-                ret: object,
-                req: WebpackInstance
-            ): void;
-            original: (
-                e: { exports: any; id: number; loaded: boolean },
-                ret: object,
-                req: WebpackInstance
-            ) => void;
+            (e: { exports: any; id: number; loaded: boolean }, ret: object, req: WebpackInstance): void;
+            original: (e: { exports: any; id: number; loaded: boolean }, ret: object, req: WebpackInstance) => void;
         };
     };
     /**

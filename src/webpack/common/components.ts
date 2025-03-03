@@ -1,55 +1,44 @@
+import { Renderable } from "@utils/types";
 import { filters, findComponentByCodeLazy, waitForComponent } from "@webpack";
-import { ComponentType, ElementType, PropsWithChildren, Ref } from "react";
+
+import { ComponentProps, ComponentType, ElementType, PropsWithChildren, Ref } from "react";
+
+type SemanticColor =
+    | "textBase"
+    | "textSubdued"
+    | "textBrightAccent"
+    | "textNegative"
+    | "textWarning"
+    | "textPositive"
+    | "textAnnouncement";
 
 export const waitForCardComponent = (name: string) => {
     return waitForComponent(
         `${name}Card`,
-        filters.componentByCode(
-            `featureIdentifier:\"${name.toLowerCase()}\"`,
-            "headerText"
-        )
+        filters.componentByCode(`featureIdentifier:\"${name.toLowerCase()}\"`, "headerText")
     );
 };
 
 export const getToggleComponent = () => {
-    return findComponentByCodeLazy<{
-        value?: boolean;
-        disabled?: boolean;
-        id?: string;
-        className?: string;
-        /** @default false */
-        condensed?: boolean;
-        inputRef?: React.Ref<unknown>;
-        onSelected?: (value: boolean) => void;
-    }>('type:"checkbox"', "onChange");
+    return findComponentByCodeLazy<
+        ComponentProps<"input"> & {
+            /** @default false */
+            condensed?: boolean;
+            inputRef?: React.Ref<unknown>;
+            onSelected?: (value: boolean) => void;
+        }
+    >('type:"checkbox"', "onChange");
 };
 
 export const ConfirmDialog = waitForComponent(
     "ConfirmDialog",
-    filters.componentByCode(
-        "isOpen",
-        "shouldCloseOnEsc",
-        "shouldFocusAfterRender",
-        "onClose"
-    )
+    filters.componentByCode("isOpen", "shouldCloseOnEsc", "shouldFocusAfterRender", "onClose")
 );
 
-export const Menu = waitForComponent(
-    "Menu",
-    filters.componentByCode("getInitialFocusElement", "children")
-);
-export const MenuItem = waitForComponent(
-    "MenuItem",
-    filters.componentByCode("handleMouseEnter", "onClick")
-);
-export const MenuSubMenuItem = waitForComponent(
-    "MenuSubMenuItem",
-    filters.componentByCode("subMenuIcon")
-);
-export const RightClickMenu = waitForComponent(
-    "RightClickMenu",
-    filters.componentByCode("right-click", "contextName")
-);
+export const Menu = waitForComponent("Menu", filters.componentByCode("getInitialFocusElement", "children"));
+export const MenuItem = waitForComponent("MenuItem", filters.componentByCode("handleMouseEnter", "onClick"));
+export const MenuSubMenuItem = waitForComponent("MenuSubMenuItem", filters.componentByCode("subMenuIcon"));
+export const RightClickMenu = waitForComponent("RightClickMenu", filters.componentByCode("right-click", "contextName"));
 
 export const RemoteConfigProvider = waitForComponent(
     "RemoteConfigProvider",
@@ -68,31 +57,32 @@ export const TooltipWrapper = waitForComponent<
     >
 >("TooltipWrapper", filters.componentByCode("renderInline", "showDelay"));
 
-export const ButtonPrimary = waitForComponent(
-    "ButtonPrimary",
-    filters.componentByName("ButtonPrimary")
-);
-export const ButtonSecondary = waitForComponent(
+type ButtonType = ComponentType<
+    ComponentProps<"button"> &
+        PropsWithChildren<{
+            as?: ElementType;
+            buttonSize?: "sm" | "md" | "lg";
+            /** @default "medium" */
+            size?: "small" | "medium";
+            semanticColor?: SemanticColor;
+            iconLeading?: Renderable;
+            iconTrailing?: Renderable;
+            iconOnly?: Renderable;
+            fullWidth?: boolean;
+        }>
+>;
+export const ButtonPrimary = waitForComponent<ButtonType>("ButtonPrimary", filters.componentByName("ButtonPrimary"));
+export const ButtonSecondary = waitForComponent<ButtonType>(
     "ButtonSecondary",
     filters.componentByName("ButtonSecondary")
 );
-export const ButtonTertiary = waitForComponent(
-    "ButtonTertiary",
-    filters.componentByName("ButtonTertiary")
-);
+export const ButtonTertiary = waitForComponent<ButtonType>("ButtonTertiary", filters.componentByName("ButtonTertiary"));
 
 export const Text = waitForComponent<
     ComponentType<
         PropsWithChildren<{
             color?: string;
-            semanticColor?:
-                | "textBase"
-                | "textSubdued"
-                | "textBrightAccent"
-                | "textNegative"
-                | "textWarning"
-                | "textPositive"
-                | "textAnnouncement";
+            semanticColor?: SemanticColor;
             paddingBottom?: number;
             /** @default "bodyMedium" */
             variant?:
@@ -115,30 +105,31 @@ export const Text = waitForComponent<
     >
 >("Text", filters.componentByCode("bodyMedium", /"data-encore-id":.\..\.Text/));
 export const Slider = waitForComponent<
-    ComponentType<{
-        value?: number;
-        max?: number;
-        step?: number;
-        labelText?: string;
-        /** @default true */
-        isInteractive?: boolean;
-        /** @default false */
-        forceActiveStyles?: boolean;
-        saberConfig?: any;
-        /** @default false */
-        isPlayingStrangerThings?: boolean;
-        isAttackOnTitanEasterEggActive?: boolean;
-        direction?: "horizontal";
-        enableAnimation?: boolean;
-        updateFrequency?: number;
-        offFrequencyUpdate?: unknown;
-        className?: string;
-        /** @default false */
-        showValueAsTimeOverHandle?: boolean;
-        onDragStart?: (v: number) => void;
-        onDragMove?: (v: number) => void;
-        onDragEnd?: (v: number) => void;
-    }>
+    ComponentType<
+        ComponentProps<"input"> & {
+            value?: number;
+            max?: number;
+            step?: number;
+            labelText?: string;
+            /** @default true */
+            isInteractive?: boolean;
+            /** @default false */
+            forceActiveStyles?: boolean;
+            saberConfig?: any;
+            /** @default false */
+            isPlayingStrangerThings?: boolean;
+            isAttackOnTitanEasterEggActive?: boolean;
+            direction?: "horizontal";
+            enableAnimation?: boolean;
+            updateFrequency?: number;
+            offFrequencyUpdate?: unknown;
+            /** @default false */
+            showValueAsTimeOverHandle?: boolean;
+            onDragStart?: (v: number) => void;
+            onDragMove?: (v: number) => void;
+            onDragEnd?: (v: number) => void;
+        }
+    >
 >("Slider", filters.componentByCode("progressBarRef"));
 export const Chip = waitForComponent("Chip", filters.componentByName("Chip"));
 
@@ -155,30 +146,20 @@ export const FeatureCard = waitForComponent(
     "FeatureCard",
     filters.componentByCode("?highlight", "headerText", "imageContainer")
 );
-export const HeroCard = waitForComponent(
-    "HeroCard",
-    filters.componentByCode('"herocard-click-handler"')
-);
+export const HeroCard = waitForComponent("HeroCard", filters.componentByCode('"herocard-click-handler"'));
 export const CardImage = waitForComponent(
     "CardImage",
     filters.componentByCode("isHero", /withWaves|isCircular/, "imageWrapper")
 );
 
-export const Router = waitForComponent(
-    "Router",
-    filters.componentByCode("navigationType", "static")
-);
+export const Router = waitForComponent("Router", filters.componentByCode("navigationType", "static"));
 export const Routes = waitForComponent(
     "Routes",
-    filters.componentByCode(
-        /\([\w$]+\)\{let\{children:[\w$]+,location:[\w$]+\}=[\w$]+/
-    )
+    filters.componentByCode(/\([\w$]+\)\{let\{children:[\w$]+,location:[\w$]+\}=[\w$]+/)
 );
 export const Route = waitForComponent(
     "Route",
-    filters.componentByCode(
-        /^function [\w$]+\([\w$]+\)\{\(0,[\w$]+\.[\w$]+\)\(\!1\)\}$/
-    )
+    filters.componentByCode(/^function [\w$]+\([\w$]+\)\{\(0,[\w$]+\.[\w$]+\)\(\!1\)\}$/)
 );
 export const Link = waitForComponent<
     ComponentType<
@@ -211,10 +192,7 @@ export const ScrollableContainer = waitForComponent(
     filters.componentByCode("scrollLeft", "showButtons")
 );
 
-export const HomeHeader = waitForComponent(
-    "HomeHeader",
-    filters.componentByCode(/}\),style:{backgroundColor:.}}\)/)
-);
+export const HomeHeader = waitForComponent("HomeHeader", filters.componentByCode(/}\),style:{backgroundColor:.}}\)/));
 export const SearchBar = waitForComponent<
     ComponentType<{
         alwaysExpanded?: boolean;
@@ -232,14 +210,7 @@ export const SearchBar = waitForComponent<
         onClear?: () => void;
         onActivate?: () => void;
     }>
->(
-    "SearchBar",
-    filters.componentByCode(
-        "alwaysExpanded",
-        "filterBoxApiRef",
-        "clearOnEscapeInElementRef"
-    )
-);
+>("SearchBar", filters.componentByCode("alwaysExpanded", "filterBoxApiRef", "clearOnEscapeInElementRef"));
 export const FilterProvider = waitForComponent(
     "FilterProvider",
     filters.componentByCode("lastFilterState", "lastFilteredUri")
@@ -247,23 +218,24 @@ export const FilterProvider = waitForComponent(
 
 export const ModalWrapper = waitForComponent<
     ComponentType<
-        PropsWithChildren<{
-            isOpen?: boolean;
-            contentLabel?: string;
-            className?: string;
-            id?: string;
-            overlayClassName?: string;
-            animated?: boolean;
-            animation?: {
-                closeTimeoutMs?: number;
-                modal?: {
-                    base: unknown;
-                    afterOpen: unknown;
-                    beforeClose: unknown;
+        ComponentProps<"div"> &
+            PropsWithChildren<{
+                isOpen?: boolean;
+                contentLabel?: string;
+                className?: string;
+                id?: string;
+                overlayClassName?: string;
+                animated?: boolean;
+                animation?: {
+                    closeTimeoutMs?: number;
+                    modal?: {
+                        base: unknown;
+                        afterOpen: unknown;
+                        beforeClose: unknown;
+                    };
                 };
-            };
-            /** @default true */
-            shouldFocusAfterRender?: boolean;
-        }>
+                /** @default true */
+                shouldFocusAfterRender?: boolean;
+            }>
     >
 >("Modal", filters.componentByCode("modal?."));

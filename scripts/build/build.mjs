@@ -1,23 +1,22 @@
 #!/usr/bin/node
-
 /**
  * Modified version of Vendicated's build.mjs
  * @link https://github.com/Vendicated/Vencord/blob/main/scripts/build/build.mjs
  */
-
-import esbuild from "esbuild";
 import {
+    BUILD_TIMESTAMP,
     IS_DEV,
     IS_REPORTER,
     VERSION,
-    BUILD_TIMESTAMP,
+    commonMinifyOpts,
     commonOpts,
-    globPlugins,
     commonRendererPlugins,
-    commonMinifyOpts
+    globPlugins
 } from "./common.mjs";
-import { minify as minifyHtml } from "html-minifier-terser";
+
+import esbuild from "esbuild";
 import { mkdir, readFile, writeFile } from "fs/promises";
+import { minify as minifyHtml } from "html-minifier-terser";
 
 const defines = {
     IS_DEV,
@@ -41,13 +40,7 @@ await Promise.all([
         plugins: [globPlugins, ...commonRendererPlugins]
     }),
     mkdir("dist", { recursive: true }),
-    writeFile(
-        "dist/index.html",
-        await minifyHtml(
-            await readFile("src/index.html", "utf-8"),
-            commonMinifyOpts
-        )
-    )
+    writeFile("dist/index.html", await minifyHtml(await readFile("src/index.html", "utf-8"), commonMinifyOpts))
 ]).catch((e) => {
     console.error("Build failed");
     console.error(e.message);

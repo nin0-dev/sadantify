@@ -44,10 +44,7 @@ export class ReconnectableWebSocket {
             if (!this.forceDisconnect) {
                 this.logger.warn("WebSocket closed. Reconnecting...");
                 if (this.reconnectLoopId === -1) {
-                    this.reconnectLoopId = setInterval(
-                        () => this.connect(),
-                        this.retryInterval
-                    ) as unknown as number;
+                    this.reconnectLoopId = setInterval(() => this.connect(), this.retryInterval) as unknown as number;
                 }
             }
             this.forceDisconnect = false;
@@ -69,9 +66,7 @@ export class ReconnectableWebSocket {
 
         switch (command) {
             case "toggle_play":
-                player.getState().isPaused
-                    ? await player.resume()
-                    : await player.pause();
+                player.getState().isPaused ? await player.resume() : await player.pause();
                 break;
             case "previous":
                 if (player.getState().positionAsOfTimestamp > 5 * 1000) {
@@ -87,21 +82,13 @@ export class ReconnectableWebSocket {
                 await player.setShuffle(!player.getState().shuffle);
                 break;
             case "toggle_repeat":
-                await player.setRepeat(
-                    player.getState().repeat === Repeat.SONG
-                        ? Repeat.CONTEXT
-                        : Repeat.SONG
-                );
+                await player.setRepeat(player.getState().repeat === Repeat.SONG ? Repeat.CONTEXT : Repeat.SONG);
                 break;
             case "lower_volume":
-                playback.setVolume(
-                    Math.max((await playback.getVolume()) - 0.05)
-                );
+                playback.setVolume(Math.max((await playback.getVolume()) - 0.05));
                 break;
             case "increase_volume":
-                playback.setVolume(
-                    Math.min(1, (await playback.getVolume()) + 0.05)
-                );
+                playback.setVolume(Math.min(1, (await playback.getVolume()) + 0.05));
                 break;
         }
 
@@ -109,11 +96,7 @@ export class ReconnectableWebSocket {
     }
 
     sendPlayerData() {
-        if (
-            !this.socket ||
-            this.socket?.readyState !== WebSocket.OPEN ||
-            !player.getState()
-        ) {
+        if (!this.socket || this.socket?.readyState !== WebSocket.OPEN || !player.getState()) {
             return;
         }
         this.socket?.send(

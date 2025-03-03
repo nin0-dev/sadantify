@@ -1,5 +1,6 @@
+import { ISettingCustomElementProps } from "@components/settings";
+
 import { PluginOptionComponent } from "@utils/types";
-import { ISettingCustomElementProps } from ".";
 
 export default (props: ISettingCustomElementProps<PluginOptionComponent>) => {
     return props.setting.component({
