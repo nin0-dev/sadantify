@@ -4,14 +4,14 @@
  *       https://github.com/Vendicated/Vencord/blob/main/src/utils/mergeDefaults.ts,
  *       https://github.com/Vendicated/Vencord/blob/main/src/shared/SettingsStore.ts
  */
+import { FileSelectResult } from "@components";
+
+import { SettingsStore as SettingsStoreClass } from "@api/settingsStore";
 import { CONFIG_KEY } from "@utils/constants";
 import { Logger } from "@utils/logger";
 import { DefinedSettings, OptionType, SettingsChecks, SettingsDefinition } from "@utils/types";
 import { React, useEffect } from "@webpack/common";
 
-import { SettingsStore as SettingsStoreClass } from "./settingsStore";
-
-import { FileSelectResult } from "components/FileSelectComponent";
 import plugins from "~plugins";
 
 const logger = new Logger("Settings");
