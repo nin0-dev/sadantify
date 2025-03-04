@@ -3,7 +3,7 @@ import "./uploadThemeModal.css";
 import { FileSelectComponent, FileSelectResult, ModalComponent, ModalFooterComponent } from "@components";
 import { CSSIcon, JavaScriptIcon } from "@components/icons";
 
-import { useSettings } from "@api/settings";
+import { PlainSettings, useSettings } from "@api/settings";
 import { Renderable } from "@utils/types";
 import { ButtonSecondary, React } from "@webpack/common";
 
@@ -18,7 +18,7 @@ type OptionProps = {
     icon?: Renderable;
     selectedFile?: FileSelectResult;
     check?: (content: string) => Promise<boolean>;
-    onUpload?: (v: FileSelectResult) => void;
+    onUpload?: (v: FileSelectResult | null) => void;
 };
 
 const checkCss = (content: string): Promise<boolean> => {
@@ -82,7 +82,13 @@ const Option = (props: OptionProps) => {
                 {selectedFile ? selectedFile.fileName : props.label}
             </ButtonSecondary>
             {selectedFile && (
-                <ButtonSecondary className="ext-upload-theme-modal-option-remove" onClick={() => setSelectedFile(null)}>
+                <ButtonSecondary
+                    className="ext-upload-theme-modal-option-remove"
+                    onClick={() => {
+                        setSelectedFile(null);
+                        props.onUpload?.(null);
+                    }}
+                >
                     Remove
                 </ButtonSecondary>
             )}
@@ -92,7 +98,7 @@ const Option = (props: OptionProps) => {
 
 export default (props: Props) => {
     const settings = useSettings();
-    const [tempSettings, _] = React.useState<Record<string, any>>({});
+    const [tempSettings, _] = React.useState<Record<string, any>>(PlainSettings.theme.files);
 
     return (
         <ModalComponent isOpen={props.isOpen} onClose={() => props.onClose?.()} animationMs={100} title="Upload Theme">
@@ -114,13 +120,9 @@ export default (props: Props) => {
             </div>
             <ModalFooterComponent
                 onConfirm={() => {
-                    for (const key in settings.theme.files) {
-                        if (settings.theme.files[key].content !== tempSettings[key]?.content) {
-                            settings.theme.files = tempSettings;
-                            props.setThemeChanged?.(true);
-                            break;
-                        }
-                    }
+                    console.log(tempSettings);
+                    console.log(settings.theme.files);
+                    settings.theme.files = tempSettings;
                     props.onClose?.();
                 }}
                 onCancel={() => props.onClose?.()}
