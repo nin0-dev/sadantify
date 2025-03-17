@@ -1,8 +1,7 @@
 /**
  * Modified version of Swishilicous's Discord WebpackInstance
- * https://github.com/Swishilicous/discord-types/blob/main/other/WebpackInstance.d.ts
+ * @link https://github.com/Swishilicous/discord-types/blob/main/other/WebpackInstance.d.ts
  */
-
 export interface WebpackInstance {
     (id: number): any;
     /**

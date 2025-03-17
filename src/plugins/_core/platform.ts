@@ -10,11 +10,11 @@ export default definePlugin({
     required: true,
     patches: [
         {
-            find: "))),{version",
+            find: "})),{version",
             replacement: {
-                match: /\)\)\),{version(:.*})}}/,
+                match: /}\)\),{version(:.*})}}/,
                 replace: (_, c) => {
-                    return `))),Extendify.Webpack.Common._loadPlatform({version${c})}}`;
+                    return `})),Extendify.Webpack.Common._loadPlatform({version${c})}}`;
                 }
             }
         }

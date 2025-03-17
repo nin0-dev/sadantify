@@ -34,7 +34,7 @@
                 "afterDeclarations": true
             }
         ],
-        "outDir": "dist"
+        "outDir": "./dist"
     },
     "include": ["src/**/*", "scripts/**/*"]
 }

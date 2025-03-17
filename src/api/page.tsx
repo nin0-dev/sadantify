@@ -1,13 +1,16 @@
+import { Logger } from "@utils/logger";
 import { Renderable } from "@utils/types";
 import { findComponentByCode } from "@webpack";
 import { platform } from "@webpack/common";
 
+const logger = new Logger("Page API");
 const pages = new Map<string, Renderable>();
 
 export const _injectPages = (children: React.ReactNode[]) => {
     const Route = findComponentByCode(/^function [\w$]+\([\w$]+\)\{\(0,[\w$]+\.[\w$]+\)\(\!1\)\}$/);
     for (const [path, Element] of pages) {
         children.push(<Route key={path.replaceAll("/", "_")} path={path} element={<Element />} />);
+        logger.debug(`Registered page ${path}`);
     }
     return children;
 };
@@ -15,3 +18,12 @@ export const _injectPages = (children: React.ReactNode[]) => {
 export const addPage = (route: string, renderable: Renderable) => pages.set(route, renderable);
 export const removePage = (route: string) => pages.delete(route);
 export const isCustomPage = (route: string = platform.getHistory().location.pathname) => pages.has(route);
+
+// 85387 router stuff
+// useLocation: zy
+// useNavitationType: wQ
+// createRoutesFromChildren: AV
+// matchRoutes: ue
+// Route: qh
+// redirect: RQ (?)
+// Routes: BV

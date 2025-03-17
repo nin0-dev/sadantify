@@ -113,7 +113,7 @@ export const find = traceFunction(
         for (const key in cache) {
             const mod = cache[key];
 
-            if (!mod.loaded || !mod?.exports) {
+            if (!mod.loaded || mod?.exports === null) {
                 continue;
             }
 
@@ -123,11 +123,6 @@ export const find = traceFunction(
 
             if (typeof mod.exports !== "object") {
                 continue;
-            }
-
-            if (mod.exports.default && filter(mod.exports.default)) {
-                const found = mod.exports.default;
-                return isWaitFor ? [found, key] : found;
             }
 
             for (const nestedMod in mod.exports) {
@@ -151,28 +146,31 @@ export const findAll = (filter: FilterFn) => {
         throw new Error("Invalid filter. Expected function got " + typeof filter);
     }
 
+    if (cache) {
+        logger.debug(`${Object.keys(cache).length} modules available in Webpack cache`);
+    }
+
     const ret = [] as any[];
     for (const key in cache) {
         const mod = cache[key];
-        if (!mod.loaded || !mod?.exports) {
+        if (!mod.loaded || mod?.exports === null) {
             continue;
         }
 
         if (filter(mod.exports)) {
             ret.push(mod.exports);
-        } else if (typeof mod.exports !== "object") {
+        }
+
+        if (typeof mod.exports !== "object") {
             continue;
         }
 
-        if (mod.exports.default && filter(mod.exports.default)) {
-            ret.push(mod.exports.default);
-        } else
-            for (const nestedMod in mod.exports) {
-                const nested = mod.exports[nestedMod];
-                if (nested && filter(nested)) {
-                    ret.push(nested);
-                }
+        for (const nestedMod in mod.exports) {
+            const nested = mod.exports[nestedMod];
+            if (nested && filter(nested)) {
+                ret.push(nested);
             }
+        }
     }
     return ret;
 };
@@ -228,15 +226,6 @@ export const findBulk = traceFunction("findBulk", (filterFns: FilterFn[]) => {
 
             if (typeof mod.exports !== "object") {
                 continue;
-            }
-
-            if (mod.exports.default && filter(mod.exports.default)) {
-                results[j] = mod.exports.default;
-                filters[j] = undefined;
-                if (++found === length) {
-                    break outer;
-                }
-                break;
             }
 
             for (const nestedMod in mod.exports) {
