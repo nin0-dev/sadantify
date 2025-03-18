@@ -25,6 +25,7 @@
             "@utils/*": ["./utils/*"],
 
             "@webpack": ["./webpack/webpack"],
+            "@webpack/patcher": ["./webpack/patcher"],
             "@webpack/common": ["./webpack/common"],
             "@webpack/types": ["./webpack/types"]
         },

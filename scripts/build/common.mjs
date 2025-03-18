@@ -20,7 +20,6 @@ export const BUILD_TIMESTAMP = Number(process.env.SOURCE_DATE_EPOCH) || Date.now
 
 export const watch = process.argv.includes("--watch") || hasArg("watch");
 export const IS_DEV = watch || process.argv.includes("--dev") || hasArg("dev");
-export const IS_REPORTER = process.argv.includes("--reporter") || hasArg("reporter");
 export const IS_STANDALONE = process.argv.includes("--standalone") || hasArg("standalone");
 
 const PluginDefinitionNameMatcher = /definePlugin\(\{\s*(["'])?name\1:\s*(["'`])(.+?)\2/;
@@ -32,7 +31,7 @@ export const resolvePluginName = async (base, dirent) => {
     const fullPath = join(base, dirent.name);
     const content = dirent.isFile()
         ? await readFile(fullPath, "utf-8")
-        : await (async () => {
+        : async () => {
               for (const file of ["index.ts", "index.tsx"]) {
                   try {
                       return await readFile(join(fullPath, file), "utf-8");
@@ -40,7 +39,7 @@ export const resolvePluginName = async (base, dirent) => {
                       continue;
                   }
               }
-          });
+          };
     return (
         PluginDefinitionNameMatcher.exec(content)?.[3] ??
         (() => {
@@ -198,7 +197,8 @@ export const commonOpts = {
     bundle: true,
     watch,
     minify: !watch,
-    sourcemap: watch ? "inline" : false,
+    sourcemap: IS_DEV ? "inline" : false,
+    // sourcemap: false,
     legalComments: "linked",
     plugins: [fileUrlPlugin],
     external: ["~plugins"],

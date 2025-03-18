@@ -19,22 +19,37 @@
         <link rel="preconnect" href="https://pl.scdn.co" crossorigin="anonymous" />
         <link rel="preconnect" href="https://spclient.wg.spotify.com" crossorigin="anonymous" />
 
-        <link href="/fonts/CircularSp-Book.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-        <link href="/fonts/CircularSp-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-        <link href="/fonts/CircularSpTitle-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-        <link href="/fonts/CircularSpTitle-Black.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link
+            rel="preload"
+            href="/fonts/SpotifyMixUI-Regular.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link rel="preload" href="/fonts/SpotifyMixUI-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link
+            rel="preload"
+            href="/fonts/SpotifyMixUITitle-Bold.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="/fonts/SpotifyMixUITitle-Extrabold.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
 
         <style data-styled="active"></style>
 
-        <link href="/vendor~xpui.css" rel="stylesheet" />
         <link href="/xpui.css" rel="stylesheet" />
-
         <link href="/extendify.css" rel="stylesheet" />
-        <script src="/extendify.js" blocking="render"></script>
     </head>
     <body class="encore-dark-theme encore-layout-themes">
         <div class="body-drag-top"></div>
-        <script src="/vendor~xpui.js"></script>
-        <script src="/xpui.js"></script>
+        <script defer src="/extendify.js"></script>
+        <script defer src="/xpui.js"></script>
     </body>
 </html>

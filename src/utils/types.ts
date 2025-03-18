@@ -22,6 +22,8 @@ export interface PatchReplacement {
     replace: string | ReplaceFn;
     /** A function which returns whether this patch replacement should be applied */
     predicate?(): boolean;
+    /** Do not warn if this patch did no changes */
+    noWarn?: boolean;
 }
 
 export interface Patch {
@@ -81,10 +83,6 @@ export interface PluginDef {
      */
     startAt?: StartAt;
     /**
-     * Which parts of the plugin can be tested by the reporter. Defaults to all parts
-     */
-    reporterTestable?: number;
-    /**
      * Optionally provide settings that the user can configure in the Plugins tab of settings.
      * @deprecated Use `settings` instead
      */
@@ -123,12 +121,6 @@ export const enum StartAt {
     /** Once Spotify's APIs have been exposed */
     ApisLoaded = "ApisLoaded",
     Connected = "Connected"
-}
-
-export const enum ReporterTestable {
-    None = 1 << 1,
-    Start = 1 << 2,
-    Patches = 1 << 3
 }
 
 export const enum OptionType {

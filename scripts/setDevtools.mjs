@@ -24,6 +24,7 @@ const enableDevtools = async () => {
     }
 
     await writeFile(bnkPath, buffer, "binary");
+    console.log("Enabled devtools");
 };
 
 enableDevtools();

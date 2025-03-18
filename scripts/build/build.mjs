@@ -6,7 +6,6 @@
 import {
     BUILD_TIMESTAMP,
     IS_DEV,
-    IS_REPORTER,
     VERSION,
     commonMinifyOpts,
     commonOpts,
@@ -20,7 +19,6 @@ import { minify as minifyHtml } from "html-minifier-terser";
 
 const defines = {
     IS_DEV,
-    IS_REPORTER,
     VERSION: JSON.stringify(VERSION),
     BUILD_TIMESTAMP
 };
@@ -35,7 +33,6 @@ await Promise.all([
         format: "iife",
         target: ["esnext"],
         globalName: "Extendify",
-        sourcemap: IS_DEV || IS_REPORTER ? "inline" : false,
         define: defines,
         plugins: [globPlugins, ...commonRendererPlugins]
     }),

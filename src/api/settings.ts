@@ -30,6 +30,7 @@ export interface Settings {
         };
         colors: {};
     };
+    eagerPatches: boolean;
 }
 
 const DefaultSettings: Settings = {
@@ -37,10 +38,11 @@ const DefaultSettings: Settings = {
     theme: {
         files: {},
         colors: {}
-    }
+    },
+    eagerPatches: false
 };
 
-const settings: Settings = !IS_REPORTER ? JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}") : {};
+const settings: Settings = JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}");
 mergeDefaults(settings, DefaultSettings);
 
 export const SettingsStore = new SettingsStoreClass(settings, {
@@ -53,7 +55,7 @@ export const SettingsStore = new SettingsStoreClass(settings, {
 
         if (path === "plugins" && key in plugins) {
             return (target[key] = {
-                enabled: IS_REPORTER || plugins[key].required || plugins[key].enabledByDefault || false
+                enabled: plugins[key].required || plugins[key].enabledByDefault || false
             });
         }
 
@@ -84,14 +86,12 @@ export const SettingsStore = new SettingsStoreClass(settings, {
     }
 });
 
-if (!IS_REPORTER) {
-    SettingsStore.addGlobalChangeListener((_, path) => {
-        localStorage.setItem(
-            CONFIG_KEY,
-            JSON.stringify(SettingsStore.plain, (_, value) => (typeof value === "bigint" ? value.toString() : value))
-        );
-    });
-}
+SettingsStore.addGlobalChangeListener((_, path) => {
+    localStorage.setItem(
+        CONFIG_KEY,
+        JSON.stringify(SettingsStore.plain, (_, value) => (typeof value === "bigint" ? value.toString() : value))
+    );
+});
 
 /**
  * Same as {@link Settings} but unproxied. You should treat this as readonly,

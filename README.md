@@ -4,6 +4,12 @@ Enhance your Spotify experience with custom plugins.
 
 The best [Spicetify](https://spicetify.app) alternative in [a familiar way](https://vencord.dev).
 
+### Update as of March 17th
+
+A couple days ago Spotify released an update built with a more recent version of Webpack.
+This update came with the side effect of almost everything of importance to something like Extendify no longer being exported in Webpack modules.
+Rather, they are anonymous iife methods. I don't know how I'll fix this.
+
 # Inspirations
 
 This project was largely inspired by [Vencord](https://vencord.dev).

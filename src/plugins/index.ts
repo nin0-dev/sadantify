@@ -3,11 +3,10 @@ import { Settings, SettingsStore } from "@api/settings";
 import { addTopbarElement, removeTopbarElement } from "@api/topbar";
 import { Logger } from "@utils/logger";
 import { canonicalizeFind } from "@utils/patches";
-import { Patch, Plugin, ReporterTestable, StartAt } from "@utils/types";
+import { Patch, Plugin, StartAt } from "@utils/types";
 import { player } from "@webpack/common";
 import { PlayerEventType, PlayerState, Song } from "@webpack/types";
 
-import { traceFunction } from "debug/tracer";
 import { diffArrays } from "diff";
 import Plugins from "~plugins";
 
@@ -22,14 +21,9 @@ export const isPluginEnabled = (p: string) => {
     return (Plugins[p]?.required || Plugins[p]?.isDependency || Settings?.plugins[p]?.enabled) ?? false;
 };
 
-export const addPatch = (newPatch: Omit<Patch, "plugin">, pluginName: string) => {
+export function addPatch(newPatch: Omit<Patch, "plugin">, pluginName: string) {
     const patch = newPatch as Patch;
     patch.plugin = pluginName;
-
-    if (IS_REPORTER) {
-        delete patch.predicate;
-        delete patch.group;
-    }
 
     if (patch.predicate && !patch.predicate()) {
         return;
@@ -40,27 +34,17 @@ export const addPatch = (newPatch: Omit<Patch, "plugin">, pluginName: string) =>
         patch.replacement = [patch.replacement];
     }
 
-    if (IS_REPORTER) {
-        patch.replacement.forEach((r) => {
-            delete r.predicate;
-        });
-    }
-
     patch.replacement = patch.replacement.filter(({ predicate }) => !predicate || predicate());
 
     patches.push(patch);
-};
-
-const isReporterTestable = (p: Plugin, part: ReporterTestable) => {
-    return p.reporterTestable === null ? true : (p.reporterTestable! & part) === part;
-};
+}
 
 const neededApiPlugins = new Set<string>();
 
 // First round-trip to mark and force enable dependencies
 // FIXME: might need to revisit this if there's ever nested dependencies (dependencies of dependencies) since this only
 // goes for the top level and their children, but for now this works okay with the current API plugins
-for (const p of pluginsValues)
+for (const p of pluginsValues) {
     if (isPluginEnabled(p.name)) {
         p.dependencies?.forEach((d) => {
             const dep = Plugins[d];
@@ -77,12 +61,18 @@ for (const p of pluginsValues)
             dep.isDependency = true;
         });
 
-        // TODO: register api plugins based on passed parameters (https://github.com/Vendicated/Vencord/blob/main/src/plugins/index.ts#L123)
+        // if (p.pages?.length) {
+        //     neededApiPlugins.add("PageAPI");
+        // }
+        // if (p.components?.renderTopbar) {
+        //     neededApiPlugins.add("TopbarAPI");
+        // }
     }
+}
 
 for (const p of neededApiPlugins) {
-    Settings.plugins[p].enabled = true;
     Plugins[p].isDependency = true;
+    Settings.plugins[p].enabled = true;
 }
 
 for (const p of pluginsValues) {
@@ -107,19 +97,17 @@ for (const p of pluginsValues) {
     }
 
     if (p.patches && isPluginEnabled(p.name)) {
-        if (!IS_REPORTER || isReporterTestable(p, ReporterTestable.Patches)) {
-            for (const patch of p.patches) {
-                addPatch(patch, p.name);
-            }
+        for (const patch of p.patches) {
+            addPatch(patch, p.name);
         }
     }
 }
 
-export const startAllPlugins = traceFunction("startAllPlugins", (target: StartAt) => {
+export const startAllPlugins = (target: StartAt) => {
     logger.info(`Starting plugins (stage ${target})`);
 
     for (const name in Plugins) {
-        if (isPluginEnabled(name) && (!IS_REPORTER || isReporterTestable(Plugins[name], ReporterTestable.Start))) {
+        if (isPluginEnabled(name)) {
             const p = Plugins[name];
 
             const startAt = p.startAt ?? StartAt.WebpackReady;
@@ -130,7 +118,7 @@ export const startAllPlugins = traceFunction("startAllPlugins", (target: StartAt
             startPlugin(p);
         }
     }
-});
+};
 
 const getPluginsForEvent = (event?: string): Plugin[] => {
     if (!event) {
@@ -223,82 +211,74 @@ export const startDependenciesRecursive = (p: Plugin): { restartNeeded: boolean;
     return { restartNeeded, failures };
 };
 
-export const startPlugin = traceFunction(
-    "startPlugin",
-    (p: Plugin) => {
-        const { name } = p;
+export const startPlugin = (p: Plugin) => {
+    const { name } = p;
 
-        logger.info("Starting plugin", name);
+    logger.info("Starting plugin", name);
 
-        if (p.start) {
-            if (p.started) {
-                logger.warn(`${name} already started`);
-                return false;
-            }
-            try {
-                p.start();
-            } catch (e) {
-                logger.error(`Failed to start ${name}`, e);
-                return false;
-            }
+    if (p.start) {
+        if (p.started) {
+            logger.warn(`${name} already started`);
+            return false;
         }
-
-        if (p.pages) {
-            for (const key in p.pages) {
-                addPage(key, p.pages[key]);
-            }
+        try {
+            p.start();
+        } catch (e) {
+            logger.error(`Failed to start ${name}`, e);
+            return false;
         }
+    }
 
-        if (p.components) {
-            if (p.components.renderTopbar) {
-                addTopbarElement(name, p.components.renderTopbar);
-            }
+    if (p.pages) {
+        for (const key in p.pages) {
+            addPage(key, p.pages[key]);
         }
+    }
 
-        p.started = true;
-
-        return true;
-    },
-    (p) => `startPlugin ${p.name}`
-);
-
-export const stopPlugin = traceFunction(
-    "stopPlugin",
-    (p: Plugin) => {
-        const { name } = p;
-
-        if (p.stop) {
-            logger.info("Stopping plugin", name);
-            if (!p.started) {
-                logger.warn(`${name} already stopped`);
-                return false;
-            }
-            try {
-                p.stop();
-            } catch (e) {
-                logger.error(`Failed to stop ${name}`, e);
-                return false;
-            }
+    if (p.components) {
+        if (p.components.renderTopbar) {
+            addTopbarElement(name, p.components.renderTopbar);
         }
+    }
 
-        if (p.pages) {
-            for (const key in p.pages) {
-                removePage(key);
-            }
+    p.started = true;
+
+    return true;
+};
+
+export const stopPlugin = (p: Plugin) => {
+    const { name } = p;
+
+    if (p.stop) {
+        logger.info("Stopping plugin", name);
+        if (!p.started) {
+            logger.warn(`${name} already stopped`);
+            return false;
         }
-
-        if (p.components) {
-            if (p.components.renderTopbar) {
-                removeTopbarElement(p.name);
-            }
+        try {
+            p.stop();
+        } catch (e) {
+            logger.error(`Failed to stop ${name}`, e);
+            return false;
         }
+    }
 
-        p.started = false;
+    if (p.pages) {
+        for (const key in p.pages) {
+            removePage(key);
+        }
+    }
 
-        return true;
-    },
-    (p) => `stopPlugin ${p.name}`
-);
+    if (p.components) {
+        if (p.components.renderTopbar) {
+            removeTopbarElement(p.name);
+        }
+    }
+
+    p.started = false;
+
+    return true;
+};
 
 export const setPluginEnabled = (plugin: Plugin, value: boolean, onRestartNeeded: (name: string) => void) => {
     const settings = Settings.plugins[plugin.name];

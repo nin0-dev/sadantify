@@ -1,20 +1,14 @@
 import { Logger } from "@utils/logger";
 import { StartAt } from "@utils/types";
 import { _resolveReady, onceReady, waitFor } from "@webpack";
+import "@webpack/patcher";
 
-import "./webpack/patcher";
-
-import { runReporter } from "debug/reporter";
 import { patches, startAllPlugins } from "plugins";
 
 export * as Api from "./api";
 export * as Plugins from "./plugins";
 export * as Util from "./utils";
 export * as Webpack from "./webpack";
-
-if (IS_REPORTER) {
-    runReporter();
-}
 
 waitFor("useState", () => _resolveReady());
 

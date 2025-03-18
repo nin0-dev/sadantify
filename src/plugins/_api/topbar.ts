@@ -2,7 +2,7 @@ import { Devs } from "@utils/constants";
 import { definePlugin } from "@utils/types";
 
 export default definePlugin({
-    name: "Topbar",
+    name: "TopbarAPI",
     description: "API to add elements to the global top navbar",
     authors: [Devs.elia],
     required: true,

@@ -2,7 +2,7 @@ import { Devs } from "@utils/constants";
 import { definePlugin } from "@utils/types";
 
 export default definePlugin({
-    name: "Page",
+    name: "PageAPI",
     description: "API to add pages",
     authors: [Devs.elia],
     required: true,
