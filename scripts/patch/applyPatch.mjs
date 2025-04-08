@@ -26,16 +26,6 @@ const createXpuiPatch = async () => {
             console.log(`Copied ${fileName}`);
         }
 
-        // TODO: Find a proper way to access Webpack's module cache as it is not accessible in the Webpack version Spotify uses
-        const find = "__webpack_require__.m=__webpack_modules__,";
-        archive.file(
-            "xpui.js",
-            (await archive.file("xpui.js").async("string")).replace(
-                find,
-                find + "__webpack_require__.c=__webpack_module_cache__,"
-            )
-        );
-
         const buffer = await archive.generateAsync({ type: "uint8array" });
         await writeFile(join(appsPath, "xpui.spa"), buffer);
         console.log("Wrote new archive");
