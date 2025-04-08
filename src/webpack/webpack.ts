@@ -6,15 +6,15 @@ import { makeLazy, proxyLazy } from "@utils/lazy";
 import { LazyComponent } from "@utils/lazyReact";
 import { Logger } from "@utils/logger";
 import { canonicalizeMatch } from "@utils/patches";
-import { AnyModuleFactory, AnyWebpackRequire, ModuleExports, WebpackRequire } from "@webpack/types";
+import { WebpackInstance } from "@webpack/types";
 
 const logger = new Logger("Webpack");
 
 export let _resolveReady: () => void;
 export const onceReady = new Promise<void>((r) => (_resolveReady = r));
 
-export let wreq: WebpackRequire;
-export let cache: WebpackRequire["c"];
+export let wreq: WebpackInstance;
+export let cache: WebpackInstance["c"];
 
 export type FilterFn = (mod: any) => boolean;
 export type PropsFilter = Array<string>;
@@ -69,62 +69,19 @@ export const filters = {
     }
 };
 
-export type CallbackFn = (mod: ModuleExports, id: PropertyKey) => void;
-export type FactoryListernFn = (factory: AnyModuleFactory, moduleId: PropertyKey) => void;
+export type CallbackFn = (mod: any, id: string) => void;
 
-export const waitForSubscriptions = new Map<FilterFn, CallbackFn>();
+export const subscriptions = new Map<FilterFn, CallbackFn>();
 export const moduleListeners = new Set<CallbackFn>();
-export const factoryListeners = new Set<FactoryListernFn>();
+export const factoryListeners = new Set<
+    (factory: (module: any, exports: any, require: WebpackInstance) => void) => void
+>();
+export const beforeInitListeners = new Set<(wreq: WebpackInstance) => void>();
 
-function makePropertyNonEnumerable(target: Record<PropertyKey, any>, key: PropertyKey) {
-    const descriptor = Object.getOwnPropertyDescriptor(target, key);
-    if (descriptor == null) return;
-
-    Reflect.defineProperty(target, key, {
-        ...descriptor,
-        enumerable: false
-    });
-}
-export function _blacklistBadModules(
-    requireCache: NonNullable<AnyWebpackRequire["c"]>,
-    exports: ModuleExports,
-    moduleId: PropertyKey
-) {
-    if (shouldIgnoreValue(exports)) {
-        makePropertyNonEnumerable(requireCache, moduleId);
-        return true;
-    }
-
-    if (typeof exports !== "object") {
-        return false;
-    }
-
-    let hasOnlyBadProperties = true;
-    for (const exportKey in exports) {
-        if (shouldIgnoreValue(exports[exportKey])) {
-            makePropertyNonEnumerable(exports, exportKey);
-        } else {
-            hasOnlyBadProperties = false;
-        }
-    }
-
-    return hasOnlyBadProperties;
-}
-
-export const _initWebpack = (webpackRequire: WebpackRequire) => {
+export const _initWebpack = (webpackRequire: WebpackInstance) => {
     wreq = webpackRequire;
+    window.__webpack_require__ = wreq;
     cache = webpackRequire.c;
-
-    Reflect.defineProperty(webpackRequire.c, Symbol.toStringTag, {
-        value: "ModuleCache",
-        configurable: true,
-        writable: true,
-        enumerable: false
-    });
-
-    if (IS_DEV) {
-        window.wreq = wreq;
-    }
 };
 
 export const handleModuleNotFound = (method: string, ...filter: unknown[]) => {
@@ -599,7 +556,7 @@ export const waitFor = (
         }
     }
 
-    waitForSubscriptions.set(filter, callback);
+    subscriptions.set(filter, callback);
 };
 
 export const waitForComponent = <T extends React.ComponentType<any> = React.ComponentType<any> & Record<string, any>>(
@@ -636,7 +593,8 @@ export const search = (...code: CodeFilter) => {
     const factories = wreq.m;
 
     for (const id in factories) {
-        const factory = factories[id];
+        const factory = factories[id].original ?? factories[id];
+
         if (stringMatches(factory.toString(), code)) {
             results[id] = factory;
         }
@@ -671,7 +629,7 @@ export const extract = (id: string | number) => {
 };
 
 export const shouldIgnoreValue = (value: any) => {
-    if ([null, undefined, window, document, document.documentElement].includes(value)) {
+    if ([null, window, document, document.documentElement].includes(value)) {
         return true;
     } else if (value[Symbol.toStringTag] === "DOMTokenList") {
         return true;

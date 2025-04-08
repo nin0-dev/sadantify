@@ -21,7 +21,7 @@ export const isCustomPage = (route: string = platform.getHistory().location.path
 
 // 85387 router stuff
 // useLocation: zy
-// useNavitationType: wQ
+// useNavigationType: wQ
 // createRoutesFromChildren: AV
 // matchRoutes: ue
 // Route: qh

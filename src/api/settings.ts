@@ -30,7 +30,6 @@ export interface Settings {
         };
         colors: {};
     };
-    eagerPatches: boolean;
 }
 
 const DefaultSettings: Settings = {
@@ -38,8 +37,7 @@ const DefaultSettings: Settings = {
     theme: {
         files: {},
         colors: {}
-    },
-    eagerPatches: false
+    }
 };
 
 const settings: Settings = JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}");
