@@ -12,7 +12,7 @@ export default definePlugin({
     required: true,
     components: {
         renderTopbar: () => (
-            <ButtonPrimary buttonSize="sm" onClick={(_: any) => redirectTo("/extendify")}>
+            <ButtonPrimary size="small" onClick={(_: any) => redirectTo("/extendify")}>
                 Extendify
             </ButtonPrimary>
         )

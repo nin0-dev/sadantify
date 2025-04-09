@@ -33,5 +33,5 @@ export interface WebpackInstance {
      * Falls back to `return e + "js"`.
      */
     u: (e: any) => string;
-    iife: () => void;
+    iife: (wreq: WebpackInstance) => void;
 }

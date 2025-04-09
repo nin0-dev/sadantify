@@ -27,17 +27,27 @@ fetch("./xpui.js")
     .then((r) => r.text())
     .then((r) => {
         [
+            // Adds webpack's module cache to the wreq instance
             {
                 find: "__webpack_require__.m=__webpack_modules__,",
                 addition: "__webpack_require__.c=__webpack_module_cache__,"
             },
+            // Exposes the private iife module
             {
                 find: "var __webpack_exports__={};(",
                 addition: "__webpack_require__.iife="
             },
+            // Passes
+            {
+                find: ".iife=()",
+                replacement: ".iife=(__webpack_require__)"
+            },
+            // Prevents the private iife module from being called.
+            // We do this because we want to patch this module, but we can only patch it when our plugins have been initialized.
+            // We prevent it from initializing at startup and then initialize it ourselves.
             {
                 find: "})(),__webpack_exports__=",
-                replacement: "}),__webpack_exports="
+                replacement: "}),__webpack_exports__="
             }
         ].forEach((v) => {
             if (v.addition) {
@@ -119,7 +129,7 @@ Object.defineProperty(Function.prototype, "m", {
                     configurable: true,
                     set(this: WebpackInstance, v: WebpackInstance["iife"]) {
                         v = patchModule(v, "Private");
-                        v();
+                        v(this);
 
                         Object.defineProperty(this, "iife", {
                             value: v,
@@ -193,6 +203,8 @@ const patchModule = (mod: any, id: string) => {
 
             try {
                 const newCode = executePatch(replacement.match, replacement.replace as string);
+                patchedBy.add(patch.plugin);
+
                 if (newCode === code) {
                     if (!patch.noWarn) {
                         logger.warn(

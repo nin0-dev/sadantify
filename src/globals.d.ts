@@ -6,6 +6,6 @@ declare global {
     export var Extendify: typeof import("./Extendify");
 
     interface Window {
-        __webpack_require__: WebpackInstance;
+        wreq: WebpackInstance;
     }
 }
