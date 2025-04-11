@@ -1,4 +1,4 @@
-import { WebpackInstance } from "@webpack/types";
+import { Platform, WebpackInstance } from "@webpack/types";
 
 declare global {
     export var IS_DEV: boolean;
@@ -7,5 +7,6 @@ declare global {
 
     interface Window {
         wreq: WebpackInstance;
+        platform: Platform;
     }
 }

@@ -103,7 +103,7 @@ export interface Platform {
         getFiltersEvents(): any;
         getSavedDevices(): any[];
         isAvailable(): boolean;
-        isNormalizationOverriden(): boolean;
+        isNormalizationOverriden(): boolean; // Typo is intentional
         removeCurrentDevice(): void;
         setCurrentDevice(): Promise<void>;
     };
@@ -211,4 +211,23 @@ export interface Identifiable {
     index?: number;
     uri: string;
     name: string;
+}
+
+export interface ProductStateAPI {
+    productStateApi: {
+        options: Record<string, string>;
+        delOverridesValues(values: any): Promise<void>;
+        getValues(): Promise<any>;
+        putOverridesValues(values: any): Promise<void>;
+    };
+}
+
+export interface CosmosAPI {
+    head(url: string, headers?: any): Promise<Record<string, string>>;
+    get<T>(url: string, params?: any, headers?: any): Promise<T>;
+    post<T>(url: string, data?: any, headers?: any): Promise<T>;
+    put<T>(url: string, data?: any, headers?: any): Promise<T>;
+    del<T>(url: string, data?: any, headers?: any): Promise<T>;
+    patch<T>(url: string, data?: any, headers?: any): Promise<T>;
+    sub<T>(url: string, data?: any, headers?: any): Promise<T>;
 }

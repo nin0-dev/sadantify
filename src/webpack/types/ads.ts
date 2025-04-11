@@ -1,40 +1,31 @@
 export type AdManagers = {
-    adStateReporter: {
-        focusState: any;
-        history: History;
-        setAdStateKey(e: any, t: any): void;
-        onFocusedChanged(element: any): void;
-    };
     audio: {
-        audioApi: any;
-        enabled: boolean;
-        getContextAdInfo(): Promise<any>;
-        inStreamApi: InStreamApi;
-        onAdMessage: (ad: any) => void;
-        subscription: any | null;
-        disable: () => Promise<void>;
+        disable(): Promise<void>;
+        inStreamApi: {
+            adsCoreConnector: {
+                clearSlot(slotId: string): void;
+                subscribeToSlot(slotId: string, callback: (data: { adSlotEvent: { slotId: string } }) => void): void;
+            };
+        };
+        isNewAdsNpvEnabled: boolean;
     };
     billboard: {
-        activating: boolean;
-        billboardApi: {
-            adsCoreConnector: any;
+        disable(): Promise<void>;
+    };
+    leaderboard: {
+        disableLeaderboard(): Promise<void>;
+    };
+    inStreamApi: {
+        disable(): Promise<void>;
+    };
+    sponsoredPlaylist: {
+        disable(): Promise<void>;
+    };
+    vto: {
+        manager: {
+            disable(): Promise<void>;
         };
-        displayBillboard(): Promise<void>;
-        enabled: boolean;
-        finish(): void;
-        focusMinimize(): void;
-        focusState: any;
-        onActivity(activity: any): Promise<void>;
-        onAdMessage(ad: any): void;
-        triggerAutoMinimizeIfPossible(): void;
-        viewedTimestamp: number;
-    };
-    config: {
-        getAdsSlotConfig(): Promise<any>;
-    };
-    home: {
-        enableLegacyHptoContainerLoader: boolean;
-        fetchHomeAd: () => Promise<Ad>;
+        isNewAdsNpvEnabled: boolean;
     };
 };
 
