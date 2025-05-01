@@ -21,10 +21,11 @@ export const waitForCardComponent = (name: string) => {
 
 export const getToggleComponent = () => {
     return findComponentByCodeLazy<
-        ComponentProps<"input"> & {
+        Omit<ComponentProps<"input">, "value"> & {
             /** @default false */
             condensed?: boolean;
             inputRef?: React.Ref<unknown>;
+            value: boolean;
             onSelected?: (value: boolean) => void;
         }
     >('type:"checkbox"', "onChange");

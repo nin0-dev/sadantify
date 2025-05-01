@@ -39,7 +39,7 @@ export default (props: Props) => {
                 />
                 <Toggle
                     id={`toggle-${props.plugin.name}`}
-                    value={`${enabled}`}
+                    value={enabled}
                     disabled={props.plugin.required || props.plugin.isDependency}
                     onSelected={(value) => {
                         setEnabled(value);
