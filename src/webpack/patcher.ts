@@ -15,6 +15,7 @@ import {
     subscriptions,
     wreq
 } from "@webpack";
+import { loadScript } from "@webpack/loader";
 import { WebpackInstance } from "@webpack/types";
 
 import { patches } from "plugins";
@@ -23,61 +24,31 @@ const logger = new Logger("WebpackInterceptor", "#8caaee");
 
 let webpackChunk: any[];
 
-fetch("./xpui.js")
-    .then((r) => r.text())
-    .then((r) => {
-        [
-            // Adds webpack's module cache to the wreq instance
-            {
-                find: "__webpack_require__.m=__webpack_modules__,",
-                addition: "__webpack_require__.c=__webpack_module_cache__,"
-            },
-            // Exposes the private iife module
-            {
-                find: "var __webpack_exports__={};(",
-                addition: "__webpack_require__.iife="
-            },
-            // Passes
-            {
-                find: ".iife=()",
-                replacement: ".iife=(__webpack_require__)"
-            },
-            // Prevents the private iife module from being called.
-            // We do this because we want to patch this module, but we can only patch it when our plugins have been initialized.
-            // We prevent it from initializing at startup and then initialize it ourselves.
-            {
-                find: "})(),__webpack_exports__=",
-                replacement: "}),__webpack_exports__="
-            }
-        ].forEach((v) => {
-            if (v.addition) {
-                r = r.replace(v.find, v.find + v.addition);
-            }
+const originalAppendChild = document.head.appendChild;
 
-            if (v.replacement) {
-                r = r.replace(v.find, v.replacement);
-            }
-        });
+document.head.appendChild = function <T extends Node>(node: T): T {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+        return originalAppendChild.call(this, node) as T;
+    }
 
-        const script = document.createElement("script");
-        script.defer = true;
-        script.textContent = r;
+    const element = node as unknown as Element;
 
-        if (IS_DEV) {
-            const sourceMap = {
-                version: 3,
-                file: "xpui.js",
-                sources: ["xpui.js"],
-                sourcesContent: [r],
-                names: [],
-                mappings: ""
-            };
-            const encodedMap = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-            script.textContent += `\n//# sourceMappingURL=data:application/json;base64,${encodedMap}`;
-        }
+    if (element.tagName.toLowerCase() !== "script") {
+        return originalAppendChild.call(this, node) as T;
+    }
 
-        document.body.appendChild(script);
-    });
+    const scriptElement = node as unknown as HTMLScriptElement;
+
+    if (!scriptElement.getAttribute("data-webpack") || scriptElement.charset !== "utf-8") {
+        return originalAppendChild.call(this, node) as T;
+    }
+
+    loadScript(scriptElement.src.substring(scriptElement.src.lastIndexOf("/") + 1));
+
+    return null as unknown as T;
+};
+
+import("@webpack/loader").then((v) => v.loadScript("xpui.js"));
 
 Object.defineProperty(window, WEBPACK_CHUNK, {
     configurable: true,
@@ -182,6 +153,9 @@ const patchModule = (mod: any, id: string) => {
     const patchedBy = new Set();
 
     let code: string = "0," + mod.toString().replaceAll("\n", "");
+    if (id !== "Private") {
+        code = code.replace(id, "function");
+    }
 
     for (let i = 0; i < patches.length; i++) {
         const patch = patches[i];
@@ -292,29 +266,34 @@ const patchModule = (mod: any, id: string) => {
 
 let webpackNotInitializedLogged = false;
 
-const patchFactories = (factories: Record<string, (module: any, exports: any, require: WebpackInstance) => void>) => {
+const patchFactories = (
+    factories: Record<string, (module: any, exports: any, require: WebpackInstance, src: string) => void>
+) => {
     for (const id in factories) {
         let mod = factories[id];
 
         const originalMod = mod;
 
         const factory = (factories[id] = function (module: any, exports: any, require: WebpackInstance) {
+            let src = Function.prototype.toString.call(mod);
+            src = src.substring(src.indexOf("{"));
+
             if (wreq === null && IS_DEV) {
                 if (!webpackNotInitializedLogged) {
                     webpackNotInitializedLogged = true;
                     logger.error("WebpackRequire was not initialized, running modules without patches instead.");
                 }
-                return void originalMod(module, exports, require);
+                return void originalMod(module, exports, require, src);
             }
 
             try {
-                mod(module, exports, require);
+                mod(module, exports, require, src);
             } catch (e) {
                 if (mod === originalMod) {
                     throw e;
                 }
                 logger.error("Error in patched module", e);
-                return void originalMod(module, exports, require);
+                return void originalMod(module, exports, require, src);
             }
 
             exports = module.exports;

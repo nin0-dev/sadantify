@@ -10,11 +10,11 @@ export default definePlugin({
     required: true,
     patches: [
         {
-            find: "})),{version",
+            find: "const{createPlatformDesktop:",
             replacement: {
-                match: /}\)\),{version(:.*})}}/,
-                replace: (_, c) => {
-                    return `})),Extendify.Webpack.Common._loadPlatform({version${c})}}`;
+                match: /(;const .=)(await async function\(\){.*?}}\(\))/,
+                replace: (_, prefix, call) => {
+                    return `${prefix}Extendify.Webpack.Common._loadPlatform(${call})`;
                 }
             }
         }

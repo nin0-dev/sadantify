@@ -26,6 +26,7 @@
 
             "@webpack": ["./webpack/webpack"],
             "@webpack/patcher": ["./webpack/patcher"],
+            "@webpack/loader": ["./webpack/loader"],
             "@webpack/common": ["./webpack/common"],
             "@webpack/types": ["./webpack/types"]
         },

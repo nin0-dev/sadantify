@@ -104,7 +104,7 @@ export const Text = waitForComponent<
             style?: string;
         }>
     >
->("Text", filters.componentByCode("bodyMedium", /"data-encore-id":.\..\.Text/));
+>("Text", filters.componentByCode("bodyMedium", /"data-encore-id":.\..\.Text,/));
 export const Slider = waitForComponent<
     ComponentType<
         ComponentProps<"input"> & {
