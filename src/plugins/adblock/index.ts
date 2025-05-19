@@ -27,7 +27,9 @@ export default definePlugin({
     required: false,
     startAt: StartAt.ApisLoaded,
     start: async () => {
-        const productState = platform.getRegistry().resolve<ProductStateAPI>(Symbol.for("key")).productStateApi;
+        const productState = platform
+            .getRegistry()
+            .resolve<ProductStateAPI>(Symbol.for("ProductStateAPI")).productStateApi;
         await productState.putOverridesValues({
             pairs: {
                 ads: "0",
