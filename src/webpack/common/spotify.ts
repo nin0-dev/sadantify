@@ -1,6 +1,6 @@
 import { proxyLazy } from "@utils/lazy";
 import { StartAt } from "@utils/types";
-import { findByCodeLazy } from "@webpack";
+import { findByCode } from "@webpack";
 import { ConnectDevicesAPI, CosmosAPI, Platform, PlaybackAPI, PlayerAPI } from "@webpack/types";
 
 import { createEventListeners, startAllPlugins } from "plugins";
@@ -23,8 +23,9 @@ export const findApiLazy = <T>(name: string): T => {
     return proxy;
 };
 
-export const findServiceLazy = <T>(id: string): T => {
-    return findByCodeLazy(`SERVICE_ID=${id}`) as T;
+// TODO: this is broken because it just finds the class and not the instance
+export const findService = <T>(id: string): T => {
+    return findByCode(`SERVICE_ID="${id}"`) as T;
 };
 
 export let platform: Platform;

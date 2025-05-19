@@ -6,7 +6,7 @@ import "./index.css";
 
 import { Devs } from "@utils/constants";
 import { StartAt, definePlugin } from "@utils/types";
-import { cosmos, findServiceLazy, platform } from "@webpack/common";
+import { cosmos, findService, platform } from "@webpack/common";
 import { ProductStateAPI } from "@webpack/types";
 
 interface SettingsClient {
@@ -26,6 +26,7 @@ export default definePlugin({
     authors: [Devs.elia],
     required: false,
     startAt: StartAt.ApisLoaded,
+    hidden: true,
     start: async () => {
         const productState = platform
             .getRegistry()
@@ -50,8 +51,8 @@ export default definePlugin({
         await adManagers.vto.manager.disable();
 
         const slots = await cosmos.get<any>("sp://ads/v1/slots");
-        const slotsClient: SlotsClient = findServiceLazy("spotify.ads.esperanto.proto.Slots");
-        const settingsClient: SettingsClient = findServiceLazy("spotify.ads.esperanto.proto.Settings");
+        const slotsClient: SlotsClient = findService("spotify.ads.esperanto.proto.Slots");
+        const settingsClient: SettingsClient = findService("spotify.ads.esperanto.proto.Settings");
 
         for (const slot of slots) {
             adManagers.audio.inStreamApi.adsCoreConnector.subscribeToSlot(
