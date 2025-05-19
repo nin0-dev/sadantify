@@ -86,27 +86,24 @@ function exportAllFunctions(content: string) {
 }
 
 export async function loadScript(name: string) {
-    console.log("Loading script " + name);
-
-    let r = await (await fetch(`/${name}`)).text();
+    let r = `// Original name: ${name}\n${await (await fetch(name)).text()}`;
     [exposeModuleCache, exposePrivateModule, exportAllFunctions].forEach((f) => (r = f(r)));
 
-    const script = document.createElement("script");
-    script.defer = true;
-    script.textContent = r;
+    // if (IS_DEV) {
+    //     const sourceMap = {
+    //         version: 3,
+    //         file: name,
+    //         sources: [name],
+    //         sourcesContent: [r],
+    //         names: [],
+    //         mappings: ""
+    //     };
+    //     const encodedMap = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+    //     r += `\n//# sourceMappingURL=data:application/json;base64,${encodedMap}`;
+    // }
 
-    if (IS_DEV) {
-        const sourceMap = {
-            version: 3,
-            file: name,
-            sources: [name],
-            sourcesContent: [r],
-            names: [],
-            mappings: ""
-        };
-        const encodedMap = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-        script.textContent += `\n//# sourceMappingURL=data:application/json;base64,${encodedMap}`;
-    }
+    const script = document.createElement("script");
+    script.src = URL.createObjectURL(new Blob([r], { type: "script/js" }));
 
     document.body.appendChild(script);
 }

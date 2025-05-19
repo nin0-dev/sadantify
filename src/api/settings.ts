@@ -16,31 +16,26 @@ import plugins from "~plugins";
 
 const logger = new Logger("Settings");
 
-export interface Settings {
+export type Settings = {
     plugins: {
         [plugin: string]: {
             enabled: boolean;
             [setting: string]: any;
         };
     };
-    theme: {
-        files: {
-            css?: FileSelectResult;
-            js?: FileSelectResult;
-        };
-        colors: {};
-    };
-}
+    enableQuickCss: boolean;
+    enabledThemes: string[];
+};
 
 const DefaultSettings: Settings = {
     plugins: {},
-    theme: {
-        files: {},
-        colors: {}
-    }
+    enableQuickCss: true,
+    enabledThemes: []
 };
 
-const settings: Settings = JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}");
+const settings: Settings = window.EXTENDIFY_NATIVE_AVAILABLE
+    ? window.ExtendifyNative.settings.get()
+    : JSON.parse(localStorage.getItem(CONFIG_KEY) ?? "{}");
 mergeDefaults(settings, DefaultSettings);
 
 export const SettingsStore = new SettingsStoreClass(settings, {
@@ -85,6 +80,10 @@ export const SettingsStore = new SettingsStoreClass(settings, {
 });
 
 SettingsStore.addGlobalChangeListener((_, path) => {
+    if (window.EXTENDIFY_NATIVE_AVAILABLE) {
+        window.ExtendifyNative.settings.set(SettingsStore.plain, path);
+        return;
+    }
     localStorage.setItem(
         CONFIG_KEY,
         JSON.stringify(SettingsStore.plain, (_, value) => (typeof value === "bigint" ? value.toString() : value))

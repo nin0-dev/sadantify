@@ -8,17 +8,11 @@ export default definePlugin({
     authors: [Devs.elia],
     required: true,
     startAt: StartAt.DOMContentLoaded,
-    start: () => {
-        if (Settings.theme.files.css) {
-            const style = document.createElement("style");
-            style.innerText = Settings.theme.files.css.content;
-            document.head.appendChild(style);
+    start() {
+        if (!window.EXTENDIFY_NATIVE_AVAILABLE) {
+            return;
         }
 
-        if (Settings.theme.files.js) {
-            const script = document.createElement("script");
-            script.innerText = Settings.theme.files.js.content;
-            document.head.appendChild(script);
-        }
+        // TODO: re-implement themes with native object
     }
 });

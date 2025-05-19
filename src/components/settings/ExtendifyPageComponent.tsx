@@ -2,7 +2,6 @@ import "./settingsSection.css";
 
 import { RestartWarningComponent } from "@components/settings";
 import { PluginsSectionComponent } from "@components/settings/plugins";
-import { ThemesSectionComponent } from "@components/settings/themes";
 
 import { React } from "@webpack/common";
 
@@ -21,7 +20,6 @@ export default () => {
                     <RestartWarningComponent needRestart={needRestart} themeChanged={themeChanged} />
                 </div>
             )}
-            <ThemesSectionComponent setThemeChanged={setThemeChanged} />
             <PluginsSectionComponent onRestartNeeded={onRestartNeeded} />
         </>
     );
