@@ -48,7 +48,13 @@ document.head.appendChild = function <T extends Node>(node: T): T {
     return null as unknown as T;
 };
 
-import("@webpack/loader").then((v) => v.loadScript("xpui.js"));
+import("@webpack/loader").then((v) => {
+    try {
+        v.loadScript("xpui.js");
+    } catch {
+        v.loadScript("xpui-snapshot.js");
+    }
+});
 
 Object.defineProperty(window, WEBPACK_CHUNK, {
     configurable: true,
