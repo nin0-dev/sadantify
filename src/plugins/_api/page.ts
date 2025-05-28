@@ -17,12 +17,9 @@ export default definePlugin({
                     }
                 },
                 {
-                    // This removes the <header> top bar element on custom pages.
-                    // There's probably a way to remove this properly, because the settings page doesn't have it.
-                    // Hopefully this is temporary.
-                    match: /({value:"top-bar",children:)(.*?}\))(}\),\(0,)/,
-                    replace: (_, prefix, children, suffix) => {
-                        return `${prefix}[!Extendify.Api.Page.isCustomPage() ? ${children} : null]${suffix}`;
+                    match: /(children:\[)(\(0,.\.jsx\)\(sh,{}\),)(\(0,.\.jsxs\)\("div",{className:"main-view-container",)/,
+                    replace: (_, prefix, __, suffix) => {
+                        return `${prefix}${suffix}`;
                     }
                 }
             ]

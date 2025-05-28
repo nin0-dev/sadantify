@@ -2,7 +2,7 @@
  * Modified version of Vendicated's patchWebpack.ts
  * @link https://github.com/Vendicated/Vencord/blob/main/src/webpack/patchWebpack.ts
  */
-import { WEBPACK_CHUNK } from "@utils/constants";
+import { ENTRYPOINT_SCRIPT, WEBPACK_CHUNK } from "@utils/constants";
 import { Logger } from "@utils/logger";
 import { canonicalizeReplacement } from "@utils/patches";
 import { PatchReplacement } from "@utils/types";
@@ -15,7 +15,7 @@ import {
     subscriptions,
     wreq
 } from "@webpack";
-import { loadScript } from "@webpack/loader";
+import { loadEntrypoint } from "@webpack/loader";
 import { WebpackInstance } from "@webpack/types";
 
 import { patches } from "plugins";
@@ -24,36 +24,10 @@ const logger = new Logger("WebpackInterceptor", "#8caaee");
 
 let webpackChunk: any[];
 
-const originalAppendChild = document.head.appendChild;
-
-document.head.appendChild = function <T extends Node>(node: T): T {
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-        return originalAppendChild.call(this, node) as T;
-    }
-
-    const element = node as unknown as Element;
-
-    if (element.tagName.toLowerCase() !== "script") {
-        return originalAppendChild.call(this, node) as T;
-    }
-
-    const scriptElement = node as unknown as HTMLScriptElement;
-
-    if (!scriptElement.getAttribute("data-webpack") || scriptElement.charset !== "utf-8") {
-        return originalAppendChild.call(this, node) as T;
-    }
-
-    loadScript(scriptElement.src.substring(scriptElement.src.lastIndexOf("/") + 1));
-
-    return null as unknown as T;
-};
-
-import("@webpack/loader").then((v) => {
-    try {
-        v.loadScript("xpui.js");
-    } catch {
-        v.loadScript("xpui-snapshot.js");
-    }
+import("@webpack/loader").then(async (v) => {
+    (await v.loadEntrypoint())
+        ? logger.info("Loaded entrypoint")
+        : logger.error("Failed to load entrypoint, make sure you're manually updated to the latest Spotify version");
 });
 
 Object.defineProperty(window, WEBPACK_CHUNK, {

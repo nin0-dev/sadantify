@@ -4,6 +4,8 @@ Enhance your Spotify experience with custom plugins.
 
 The best [Spicetify](https://spicetify.app) alternative in [a familiar way](https://vencord.dev).
 
+Join the official Extendify [Discord server](https://discord.gg/eWD5BahyBm)!
+
 # Inspirations
 
 This project was largely inspired by [Vencord](https://vencord.dev).
@@ -16,7 +18,17 @@ I also took inspiration from [Spicetify](https://spicetify.app). I just thought 
 
 If you're on Windows, Extendify requires installing Spotify from the installer. (**NOT THE MICROSOFT STORE!**)
 
+If you already have Spotify installed through this method, your install is probably not up to date, even if you're technically on the latest version.
+See the next section for info on how to manually update your install.
+
 Currently the `applyPatch.mjs` script supports Windows and Linux (tested on Arch + Hyprland).
+
+## Manual Updating
+
+The idea of manual updating is that you delete the `.spa` files in the `Apps` folder of the Spotify install and then re-run the installer.
+This solves our problem of out of date archives 99.9% of the time.
+
+You can get the latest installer from [here (Windows + MacOS + Linux)](https://loadspot.pages.dev/) or [here (Windows only)](https://download.scdn.co/SpotifySetup.exe).
 
 ## Scripts:
 
